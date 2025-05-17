@@ -3,16 +3,30 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Check } from 'lucide-react';
+import { Check, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { fetchPricingPlans, type PricingPlan } from '@/api/pricing';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const PricingTable = () => {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+  const [selectedClassBundle, setSelectedClassBundle] = useState<string>("5");
   
   const { data: plans, isLoading, error } = useQuery({
     queryKey: ['pricing-plans'],
@@ -38,6 +52,10 @@ const PricingTable = () => {
   const getYearlyPrice = (monthlyPrice: number) => {
     // 15% discount for yearly billing
     return Math.round(monthlyPrice * 12 * 0.85);
+  };
+
+  const getClassBundlePrice = (basePrice: number, bundleSize: number) => {
+    return basePrice * bundleSize;
   };
 
   return (
@@ -66,7 +84,7 @@ const PricingTable = () => {
         </div>
 
         {/* Pricing cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.id}
@@ -85,21 +103,66 @@ const PricingTable = () => {
                 <CardHeader className={`${plan.isPopular ? 'pt-6' : 'pt-8'} pb-6 text-center`}>
                   <h3 className="text-2xl font-bold mb-3">{plan.title}</h3>
                   <p className="text-muted-foreground mb-4">{plan.description}</p>
-                  <div className="mb-2">
-                    <span className="text-4xl font-bold">
-                      ${billingCycle === 'monthly' ? plan.price : getYearlyPrice(plan.price) / 12}
-                    </span>
-                    <span className="text-muted-foreground">/month</span>
-                  </div>
-                  {billingCycle === 'yearly' && (
-                    <p className="text-sm text-muted-foreground">
-                      ${getYearlyPrice(plan.price)} billed annually
-                    </p>
-                  )}
-                  {plan.tutorHours && (
-                    <p className="text-sm mt-2 text-thinkbridge-700 font-medium">
-                      Includes {plan.tutorHours} hours of live tutoring per month
-                    </p>
+                  
+                  {plan.billing === 'per-class' ? (
+                    <>
+                      <div className="mb-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="text-sm text-muted-foreground">Bundle size:</span>
+                          <Select 
+                            value={selectedClassBundle} 
+                            onValueChange={setSelectedClassBundle}
+                          >
+                            <SelectTrigger className="w-24">
+                              <SelectValue placeholder="5 classes" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="5">5 classes</SelectItem>
+                              <SelectItem value="10">10 classes</SelectItem>
+                              <SelectItem value="15">15 classes</SelectItem>
+                              <SelectItem value="20">20 classes</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Select your preferred package size</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                      </div>
+                      <div className="mb-2">
+                        <span className="text-4xl font-bold">
+                          ${getClassBundlePrice(plan.price, parseInt(selectedClassBundle))}
+                        </span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        ${plan.price}/class (bundle of {selectedClassBundle})
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="mb-2">
+                        <span className="text-4xl font-bold">
+                          ${billingCycle === 'monthly' ? plan.price : getYearlyPrice(plan.price) / 12}
+                        </span>
+                        <span className="text-muted-foreground">/month</span>
+                      </div>
+                      {billingCycle === 'yearly' && (
+                        <p className="text-sm text-muted-foreground">
+                          ${getYearlyPrice(plan.price)} billed annually
+                        </p>
+                      )}
+                      {plan.tutorHours && (
+                        <p className="text-sm mt-2 text-thinkbridge-700 font-medium">
+                          Includes {plan.tutorHours} hours of live tutoring per month
+                        </p>
+                      )}
+                    </>
                   )}
                 </CardHeader>
                 <CardContent className="flex-grow">

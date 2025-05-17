@@ -1,14 +1,14 @@
-
 export interface PricingPlan {
   id: string;
   title: string;
   price: number;
-  billing: 'monthly' | 'yearly';
+  billing: 'monthly' | 'yearly' | 'per-class';
   description: string;
   features: string[];
   isPopular?: boolean;
   tutorHours?: number;
   ctaText: string;
+  classes?: number;
 }
 
 export interface PricingFeatureComparison {
@@ -16,6 +16,7 @@ export interface PricingFeatureComparison {
   aiBasic: string | boolean;
   tutorLite: string | boolean;
   tutorPlus: string | boolean;
+  tutorOnly?: string | boolean;
 }
 
 export const fetchPricingPlans = async (): Promise<PricingPlan[]> => {
@@ -23,6 +24,21 @@ export const fetchPricingPlans = async (): Promise<PricingPlan[]> => {
   await new Promise(resolve => setTimeout(resolve, 800));
   
   return [
+    {
+      id: "tutor-only",
+      title: "Tutor Only",
+      price: 35,
+      billing: "per-class",
+      description: "Pure tutoring experience without AI features",
+      features: [
+        "Live sessions with expert tutors",
+        "Choose bundle size (5, 10, 15, or 20 classes)",
+        "Personalized feedback",
+        "Homework help",
+        "Exam preparation"
+      ],
+      ctaText: "Get Tutor Only"
+    },
     {
       id: "ai-basic",
       title: "AI Basic",
@@ -84,43 +100,50 @@ export const fetchFeatureComparison = async (): Promise<PricingFeatureComparison
       feature: "AI Chat Support",
       aiBasic: "Unlimited",
       tutorLite: "Unlimited",
-      tutorPlus: "Priority Unlimited"
+      tutorPlus: "Priority Unlimited",
+      tutorOnly: false
     },
     {
       feature: "Adaptive Lessons",
       aiBasic: "Basic",
       tutorLite: "Advanced",
-      tutorPlus: "Premium"
+      tutorPlus: "Premium",
+      tutorOnly: false
     },
     {
       feature: "Live Tutoring Sessions",
       aiBasic: false,
       tutorLite: "4 hrs/month",
-      tutorPlus: "8 hrs/month"
+      tutorPlus: "8 hrs/month",
+      tutorOnly: "Pay per class"
     },
     {
       feature: "Custom Study Plans",
       aiBasic: "AI-generated",
       tutorLite: "Tutor-reviewed",
-      tutorPlus: "Tutor-created"
+      tutorPlus: "Tutor-created",
+      tutorOnly: "Tutor-created"
     },
     {
       feature: "Homework Help",
       aiBasic: "Basic",
       tutorLite: true,
-      tutorPlus: true
+      tutorPlus: true,
+      tutorOnly: true
     },
     {
       feature: "Exam Prep Materials",
       aiBasic: "Limited",
       tutorLite: true,
-      tutorPlus: "Premium"
+      tutorPlus: "Premium",
+      tutorOnly: "Basic"
     },
     {
       feature: "Priority Support",
       aiBasic: false,
       tutorLite: false,
-      tutorPlus: true
+      tutorPlus: true,
+      tutorOnly: false
     }
   ];
 };
