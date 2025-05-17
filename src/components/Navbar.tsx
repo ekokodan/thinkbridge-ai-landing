@@ -41,17 +41,17 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
-            <Link to="/#about" className="font-medium hover:text-thinkbridge-700 transition-colors">
+            <Link to="/about" className="font-medium hover:text-thinkbridge-700 transition-colors">
               About
             </Link>
-            <Link to="/#subjects" className="font-medium hover:text-thinkbridge-700 transition-colors">
+            <Link to="/subjects" className="font-medium hover:text-thinkbridge-700 transition-colors">
               Subjects
             </Link>
-            <Link to="/#testimonials" className="font-medium hover:text-thinkbridge-700 transition-colors">
-              Testimonials
+            <Link to="/pricing" className="font-medium hover:text-thinkbridge-700 transition-colors">
+              Pricing
             </Link>
-            <Link to="/#faq" className="font-medium hover:text-thinkbridge-700 transition-colors">
-              FAQ
+            <Link to="/join-tutor" className="font-medium hover:text-thinkbridge-700 transition-colors">
+              Join as Tutor
             </Link>
             <Link to="/book" className="btn-primary">
               Book a Tutor
@@ -74,32 +74,32 @@ const Navbar = () => {
         <div className="md:hidden bg-white p-4 shadow-md">
           <nav className="flex flex-col gap-4">
             <Link
-              to="/#about"
+              to="/about"
               className="p-2 hover:bg-gray-100 rounded"
               onClick={() => setIsMenuOpen(false)}
             >
               About
             </Link>
             <Link
-              to="/#subjects"
+              to="/subjects"
               className="p-2 hover:bg-gray-100 rounded"
               onClick={() => setIsMenuOpen(false)}
             >
               Subjects
             </Link>
             <Link
-              to="/#testimonials"
+              to="/pricing"
               className="p-2 hover:bg-gray-100 rounded"
               onClick={() => setIsMenuOpen(false)}
             >
-              Testimonials
+              Pricing
             </Link>
             <Link
-              to="/#faq"
+              to="/join-tutor"
               className="p-2 hover:bg-gray-100 rounded"
               onClick={() => setIsMenuOpen(false)}
             >
-              FAQ
+              Join as Tutor
             </Link>
             <Link
               to="/book"
