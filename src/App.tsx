@@ -10,7 +10,9 @@ import LoadingSpinner from "./components/LoadingSpinner";
 
 // Lazy-loaded pages
 const LandingPage = lazy(() => import("./pages/Index"));
-const BookingPage = lazy(() => import("./pages/BookingPage"));
+const BookingPage = lazy(() => import("./pages/booking/BookingPage"));
+const PricingPage = lazy(() => import("./pages/pricing/PricingPage"));
+const WaitlistPage = lazy(() => import("./pages/waitlist/WaitlistPage"));
 
 const queryClient = new QueryClient();
 
@@ -23,7 +25,9 @@ const App = () => (
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/book" element={<BookingPage />} />
+            <Route path="/book/*" element={<BookingPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/waitlist" element={<WaitlistPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
