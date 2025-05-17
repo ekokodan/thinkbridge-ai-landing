@@ -49,11 +49,14 @@ const formSchema = z.object({
   }),
 });
 
+// Make sure this type exactly matches the schema above
+type WaitlistFormValues = z.infer<typeof formSchema>;
+
 const WaitlistForm = () => {
   const [submitted, setSubmitted] = useState(false);
 
   // Initialize form
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<WaitlistFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
@@ -61,7 +64,7 @@ const WaitlistForm = () => {
       role: 'student',
       subjects: [],
       preferredPlan: 'ai',
-      consent: false,
+      consent: false as unknown as true, // We'll validate it to be true with our schema
     },
   });
 
@@ -74,8 +77,9 @@ const WaitlistForm = () => {
   });
 
   // Handle form submission
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    mutation.mutate(values);
+  function onSubmit(values: WaitlistFormValues) {
+    // At this point, values will have all required fields because of the schema validation
+    mutation.mutate(values as WaitlistFormData);
   }
 
   return (
