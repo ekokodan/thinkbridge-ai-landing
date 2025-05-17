@@ -1,73 +1,93 @@
-# Welcome to your Lovable project
 
-## Project info
+# ThinkBridge Landing Page
 
-**URL**: https://lovable.dev/projects/6f4ce1ed-d8d3-4ea9-825b-5c6382c88c7f
+A modern, responsive landing page for ThinkBridge, an AI-powered educational platform that offers personalized learning experiences.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- **HeroSection** - Main call-to-action with "Book a Tutor" and "Join Waitlist" buttons
+- **AboutThinkBridge** - 3-column feature grid highlighting key platform benefits
+- **UpcomingNews** - Latest announcements and upcoming features
+- **TutoringBanner** - Highlighting available subjects for private tutoring
+- **SubjectsOffered** - Comprehensive list of available subjects
+- **TestimonialsCarousel** - Auto-advancing customer quotes
+- **FAQAccordion** - Common questions and answers
+- **Responsive Design** - Optimized for all devices from mobile to desktop
 
-**Use Lovable**
+## Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/6f4ce1ed-d8d3-4ea9-825b-5c6382c88c7f) and start prompting.
+- React 18 with TypeScript
+- Vite for fast development and bundling
+- TailwindCSS for styling
+- shadcn/ui for accessible UI components
+- React Router for navigation
+- React Query for data fetching
+- Lucide React for icons
 
-Changes made via Lovable will be committed automatically to this repo.
+## Getting Started
 
-**Use your preferred IDE**
+### Prerequisites
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- Node.js (v14 or higher)
+- npm or pnpm
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Installation
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
+```bash
+# Install dependencies
 npm i
+# OR
+pnpm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
+# OR
+pnpm dev
 ```
 
-**Edit a file directly in GitHub**
+The app will be available at http://localhost:8080
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Component Structure
 
-**Use GitHub Codespaces**
+```
+src/
+├── api/                # Mock API services
+├── components/         # UI components
+│   ├── ui/             # shadcn UI components
+│   ├── HeroSection.tsx
+│   ├── AboutThinkBridge.tsx
+│   ├── UpcomingNews.tsx
+│   ├── TutoringBanner.tsx
+│   ├── SubjectsOffered.tsx
+│   ├── TestimonialsCarousel.tsx
+│   ├── FAQAccordion.tsx
+│   ├── Footer.tsx
+│   └── Navbar.tsx
+├── pages/              # Page components
+│   ├── Index.tsx       # Landing page
+│   └── BookingPage.tsx # Placeholder for future booking flow
+└── App.tsx             # Main app component with routes
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Accessibility
 
-## What technologies are used for this project?
+- WCAG 2.1 AA compliant
+- Semantic HTML structure
+- Color contrast ratios meet accessibility standards
+- Skip-to-content link
+- ARIA labels for interactive elements
+- Keyboard navigation support
 
-This project is built with:
+## Tests
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Run tests with:
 
-## How can I deploy this project?
+```bash
+npm test
+# OR
+pnpm test
+```
 
-Simply open [Lovable](https://lovable.dev/projects/6f4ce1ed-d8d3-4ea9-825b-5c6382c88c7f) and click on Share -> Publish.
+## License
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+This project is licensed under the MIT License.
