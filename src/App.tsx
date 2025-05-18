@@ -17,6 +17,12 @@ const AboutPage = lazy(() => import("./pages/about/AboutPage"));
 const SubjectsPage = lazy(() => import("./pages/subjects/SubjectsPage"));
 const JoinTutorPage = lazy(() => import("./pages/join-tutor/JoinTutorPage"));
 
+// Tutor Dashboard and Library pages
+const TutorLayout = lazy(() => import("./pages/tutor/TutorLayout"));
+const TutorDashboard = lazy(() => import("./pages/tutor/TutorDashboard"));
+const StudentsPage = lazy(() => import("./pages/tutor/StudentsPage"));
+const LibraryPage = lazy(() => import("./pages/library/LibraryPage"));
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -34,6 +40,19 @@ const App = () => (
             <Route path="/about" element={<AboutPage />} />
             <Route path="/subjects" element={<SubjectsPage />} />
             <Route path="/join-tutor" element={<JoinTutorPage />} />
+            
+            {/* Tutor Dashboard Routes */}
+            <Route path="/tutor" element={<TutorLayout />}>
+              <Route index element={<TutorDashboard />} />
+              <Route path="students" element={<StudentsPage />} />
+              <Route path="students/:id" element={<StudentsPage />} />
+              {/* Additional tutor routes will be added here */}
+            </Route>
+            
+            {/* Library Routes */}
+            <Route path="/library" element={<LibraryPage />} />
+            <Route path="/library/:id" element={<LibraryPage />} />
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
