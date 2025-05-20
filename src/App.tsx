@@ -23,6 +23,11 @@ const TutorDashboard = lazy(() => import("./pages/tutor/TutorDashboard"));
 const StudentsPage = lazy(() => import("./pages/tutor/StudentsPage"));
 const LibraryPage = lazy(() => import("./pages/library/LibraryPage"));
 
+// Course pages
+const CoursePage = lazy(() => import("./pages/courses/CoursePage"));
+const UnitPage = lazy(() => import("./pages/courses/UnitPage"));
+const LessonPage = lazy(() => import("./pages/courses/LessonPage"));
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -52,6 +57,11 @@ const App = () => (
             {/* Library Routes */}
             <Route path="/library" element={<LibraryPage />} />
             <Route path="/library/:id" element={<LibraryPage />} />
+            
+            {/* Course Routes */}
+            <Route path="/courses/:courseId" element={<CoursePage />} />
+            <Route path="/courses/:courseId/units/:unitId" element={<UnitPage />} />
+            <Route path="/courses/:courseId/lessons/:lessonId" element={<LessonPage />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
