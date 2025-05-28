@@ -23,6 +23,9 @@ const TutorDashboard = lazy(() => import("./pages/tutor/TutorDashboard"));
 const StudentsPage = lazy(() => import("./pages/tutor/StudentsPage"));
 const LibraryPage = lazy(() => import("./pages/library/LibraryPage"));
 
+// Admin pages
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+
 // Course pages
 const CoursePage = lazy(() => import("./pages/courses/CoursePage"));
 const UnitPage = lazy(() => import("./pages/courses/UnitPage"));
@@ -45,6 +48,9 @@ const App = () => (
             <Route path="/about" element={<AboutPage />} />
             <Route path="/subjects" element={<SubjectsPage />} />
             <Route path="/join-tutor" element={<JoinTutorPage />} />
+            
+            {/* Admin Dashboard Routes */}
+            <Route path="/admin" element={<AdminDashboard />} />
             
             {/* Tutor Dashboard Routes */}
             <Route path="/tutor" element={<TutorLayout />}>

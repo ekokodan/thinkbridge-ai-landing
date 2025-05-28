@@ -4,14 +4,9 @@ import ProgressSquares from '../ProgressSquares';
 import { useProgressStore, MasteryLevel } from '@/stores/useProgressStore';
 
 // Mock the zustand store
-jest.mock('@/stores/useProgressStore', () => {
-  const originalModule = jest.requireActual('@/stores/useProgressStore');
-  return {
-    __esModule: true,
-    ...originalModule,
-    useProgressStore: jest.fn()
-  };
-});
+jest.mock('@/stores/useProgressStore');
+
+const mockUseProgressStore = useProgressStore as jest.MockedFunction<typeof useProgressStore>;
 
 describe('ProgressSquares', () => {
   const mockItems = [
@@ -21,14 +16,20 @@ describe('ProgressSquares', () => {
   ];
 
   it('renders the correct number of squares', () => {
-    // Mock the progress store
-    (useProgressStore as jest.Mock).mockReturnValue({
+    // Mock the progress store return value
+    mockUseProgressStore.mockReturnValue({
       progress: {
         item1: { masteryLevel: 'mastered' as MasteryLevel, completed: true }
       },
       quizzes: {
         item2: { masteryLevel: 'familiar' as MasteryLevel, completed: true, score: 70 }
-      }
+      },
+      addProgress: jest.fn(),
+      updateProgress: jest.fn(),
+      addQuizResult: jest.fn(),
+      getXP: jest.fn().mockReturnValue(0),
+      getBadges: jest.fn().mockReturnValue([]),
+      clearProgress: jest.fn()
     });
 
     render(<ProgressSquares items={mockItems} />);
