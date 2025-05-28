@@ -215,13 +215,13 @@ const AdminDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Button className="h-20 flex flex-col">
+              <Button className="h-20 flex flex-col" onClick={() => navigate('/admin/clients')}>
                 <Users className="mb-2" />
-                Add New Client
+                Manage Clients
               </Button>
-              <Button variant="outline" className="h-20 flex flex-col">
-                <Calendar className="mb-2" />
-                Schedule Session
+              <Button variant="outline" className="h-20 flex flex-col" onClick={() => navigate('/admin/students')}>
+                <BookOpen className="mb-2" />
+                Manage Students
               </Button>
               <Button variant="outline" className="h-20 flex flex-col">
                 <DollarSign className="mb-2" />

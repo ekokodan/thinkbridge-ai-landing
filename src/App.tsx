@@ -1,4 +1,3 @@
-
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -26,6 +25,8 @@ const LibraryPage = lazy(() => import("./pages/library/LibraryPage"));
 // Admin pages
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const NotificationCenter = lazy(() => import("./pages/admin/NotificationCenter"));
+const ClientManagement = lazy(() => import("./pages/admin/ClientManagement"));
+const StudentManagement = lazy(() => import("./pages/admin/StudentManagement"));
 
 // Course pages
 const CoursePage = lazy(() => import("./pages/courses/CoursePage"));
@@ -53,6 +54,8 @@ const App = () => (
             {/* Admin Dashboard Routes */}
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/notifications" element={<NotificationCenter />} />
+            <Route path="/admin/clients" element={<ClientManagement />} />
+            <Route path="/admin/students" element={<StudentManagement />} />
             
             {/* Tutor Dashboard Routes */}
             <Route path="/tutor" element={<TutorLayout />}>
