@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/sonner';
@@ -50,7 +49,7 @@ function App() {
           <Route path="/library" element={<LibraryPage />} />
           <Route path="/waitlist" element={<WaitlistPage />} />
           <Route path="/join-tutor" element={<JoinTutorPage />} />
-          <Route path="/booking/*" element={<BookingLayout />} />
+          <Route path="/booking/*" element={<BookingLayout><div /></BookingLayout>} />
           
           {/* Tutor Routes */}
           <Route path="/tutor" element={<TutorLayout />}>

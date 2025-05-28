@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,21 +10,21 @@ import TemplateManager from '@/components/admin/TemplateManager';
 import NotificationSender from '@/components/admin/NotificationSender';
 import DeliveryTracking from '@/components/admin/DeliveryTracking';
 import ReminderAutomation from '@/components/admin/ReminderAutomation';
-import { useNotificationData } from '@/hooks/useNotificationData';
+import { useNotificationTemplates, useNotificationLogs } from '@/hooks/useNotificationData';
+import { useAdminStore } from '@/stores/useAdminStore';
 
 const NotificationCenter: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const { 
-    templates, 
-    notifications, 
-    automations, 
-    isLoading 
-  } = useNotificationData();
+  const { data: templates, isLoading: templatesLoading } = useNotificationTemplates();
+  const { data: logs, isLoading: logsLoading } = useNotificationLogs();
+  const { clients } = useAdminStore();
 
-  const filteredTemplates = templates.filter(template =>
+  const isLoading = templatesLoading || logsLoading;
+
+  const filteredTemplates = templates?.filter(template =>
     template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    template.subject.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    template.subject?.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -100,15 +99,15 @@ const NotificationCenter: React.FC = () => {
         </TabsList>
 
         <TabsContent value="templates">
-          <TemplateManager />
+          <TemplateManager templates={templates || []} />
         </TabsContent>
 
         <TabsContent value="send">
-          <NotificationSender />
+          <NotificationSender templates={templates || []} clients={clients} />
         </TabsContent>
 
         <TabsContent value="tracking">
-          <DeliveryTracking />
+          <DeliveryTracking logs={logs || []} />
         </TabsContent>
 
         <TabsContent value="automation">
