@@ -1,5 +1,5 @@
 
-import { Client, Student, Payment, Class, ClassSession, Notification } from '@/stores/useAdminStore';
+import { Client, Student, Payment, Class, ClassSession } from '@/stores/useAdminStore';
 
 // Mock data generators
 export const generateMockClients = (): Client[] => [
@@ -8,6 +8,14 @@ export const generateMockClients = (): Client[] => [
     name: 'Sarah Johnson',
     email: 'sarah.johnson@email.com',
     phone: '+1 (555) 123-4567',
+    status: 'active',
+    totalLessonsRemaining: 24,
+    notes: 'Very engaged parent, punctual with payments',
+    emergencyContact: {
+      name: 'Michael Johnson',
+      phone: '+1 (555) 123-4568',
+      relationship: 'Father'
+    },
     createdAt: '2024-01-15T10:00:00Z',
     updatedAt: '2024-01-15T10:00:00Z',
   },
@@ -16,6 +24,14 @@ export const generateMockClients = (): Client[] => [
     name: 'Michael Chen',
     email: 'michael.chen@email.com',
     phone: '+1 (555) 987-6543',
+    status: 'active',
+    totalLessonsRemaining: 16,
+    notes: 'Prefers evening sessions for children',
+    emergencyContact: {
+      name: 'Lisa Chen',
+      phone: '+1 (555) 987-6544',
+      relationship: 'Mother'
+    },
     createdAt: '2024-01-20T14:30:00Z',
     updatedAt: '2024-01-20T14:30:00Z',
   },
@@ -24,6 +40,14 @@ export const generateMockClients = (): Client[] => [
     name: 'Emily Rodriguez',
     email: 'emily.rodriguez@email.com', 
     phone: '+1 (555) 456-7890',
+    status: 'active',
+    totalLessonsRemaining: 8,
+    notes: 'Single mother, needs flexible scheduling',
+    emergencyContact: {
+      name: 'Carlos Rodriguez',
+      phone: '+1 (555) 456-7891',
+      relationship: 'Uncle'
+    },
     createdAt: '2024-02-01T09:15:00Z',
     updatedAt: '2024-02-01T09:15:00Z',
   }
@@ -35,6 +59,22 @@ export const generateMockStudents = (): Student[] => [
     clientId: '1',
     name: 'Emma Johnson',
     email: 'emma.johnson@email.com',
+    grade: '9th Grade',
+    subjects: ['Algebra', 'Physics'],
+    lessonBalance: 12,
+    totalLessonsCompleted: 8,
+    status: 'active',
+    assignedWork: [
+      {
+        id: '1',
+        title: 'Quadratic Equations Practice',
+        description: 'Complete exercises 1-15 on page 45',
+        subject: 'Algebra',
+        dueDate: '2024-06-01',
+        status: 'assigned',
+        assignedDate: '2024-05-28T10:00:00Z'
+      }
+    ],
     notes: 'Excellent in math, needs help with algebra',
     createdAt: '2024-01-15T10:30:00Z',
     updatedAt: '2024-01-15T10:30:00Z',
@@ -43,6 +83,12 @@ export const generateMockStudents = (): Student[] => [
     id: '2',
     clientId: '1', 
     name: 'Lucas Johnson',
+    grade: '7th Grade',
+    subjects: ['Basic Math', 'Science'],
+    lessonBalance: 12,
+    totalLessonsCompleted: 4,
+    status: 'active',
+    assignedWork: [],
     notes: 'Beginner level, very motivated',
     createdAt: '2024-01-15T10:35:00Z',
     updatedAt: '2024-01-15T10:35:00Z',
@@ -52,6 +98,22 @@ export const generateMockStudents = (): Student[] => [
     clientId: '2',
     name: 'Alex Chen',
     email: 'alex.chen@email.com',
+    grade: '11th Grade',
+    subjects: ['AP Calculus', 'AP Physics'],
+    lessonBalance: 8,
+    totalLessonsCompleted: 12,
+    status: 'active',
+    assignedWork: [
+      {
+        id: '2',
+        title: 'Calculus Integration Problems',
+        description: 'Work through chapter 8 problems',
+        subject: 'AP Calculus',
+        dueDate: '2024-05-30',
+        status: 'in-progress',
+        assignedDate: '2024-05-25T14:00:00Z'
+      }
+    ],
     notes: 'Advanced student, preparing for AP exams',
     createdAt: '2024-01-20T15:00:00Z',
     updatedAt: '2024-01-20T15:00:00Z',
@@ -60,6 +122,12 @@ export const generateMockStudents = (): Student[] => [
     id: '4',
     clientId: '3',
     name: 'Sofia Rodriguez',
+    grade: '10th Grade',
+    subjects: ['Chemistry', 'Biology'],
+    lessonBalance: 4,
+    totalLessonsCompleted: 6,
+    status: 'active',
+    assignedWork: [],
     notes: 'Needs confidence building in science',
     createdAt: '2024-02-01T09:45:00Z',
     updatedAt: '2024-02-01T09:45:00Z',

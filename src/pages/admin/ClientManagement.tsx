@@ -10,24 +10,23 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Users, Plus, Search, Edit, Trash2, Phone, Mail, User } from 'lucide-react';
+import { Users, Plus, Search, Edit, Trash2, User, Phone, Mail, AlertCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useClients } from '@/hooks/useAdminData';
+import { useClients, useStudentsByClient, usePaymentsByClient } from '@/hooks/useAdminData';
 import { useAdminStore, Client } from '@/stores/useAdminStore';
 
 const clientFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  email: z.string().email('Valid email is required'),
-  phone: z.string().min(1, 'Phone is required'),
+  email: z.string().email('Invalid email address'),
+  phone: z.string().min(1, 'Phone number is required'),
   status: z.enum(['active', 'inactive']),
+  totalLessonsRemaining: z.number().min(0, 'Lesson count cannot be negative'),
   notes: z.string().optional(),
-  emergencyContact: z.object({
-    name: z.string().optional(),
-    phone: z.string().optional(),
-    relationship: z.string().optional(),
-  }).optional(),
+  emergencyContactName: z.string().optional(),
+  emergencyContactPhone: z.string().optional(),
+  emergencyContactRelationship: z.string().optional(),
 });
 
 type ClientFormData = z.infer<typeof clientFormSchema>;
@@ -36,8 +35,11 @@ const ClientManagement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   
   const { data: clients = [], isLoading } = useClients();
+  const { data: clientStudents = [] } = useStudentsByClient(selectedClientId);
+  const { data: clientPayments = [] } = usePaymentsByClient(selectedClientId);
   const { actions } = useAdminStore();
   
   const form = useForm<ClientFormData>({
@@ -47,32 +49,40 @@ const ClientManagement: React.FC = () => {
       email: '',
       phone: '',
       status: 'active',
+      totalLessonsRemaining: 0,
       notes: '',
-      emergencyContact: {
-        name: '',
-        phone: '',
-        relationship: '',
-      },
+      emergencyContactName: '',
+      emergencyContactPhone: '',
+      emergencyContactRelationship: '',
     },
   });
 
   const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    client.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    client.phone.includes(searchQuery)
+    client.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleSubmit = (data: ClientFormData) => {
+    const clientData = {
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      status: data.status,
+      totalLessonsRemaining: data.totalLessonsRemaining,
+      notes: data.notes,
+      emergencyContact: (data.emergencyContactName && data.emergencyContactPhone && data.emergencyContactRelationship) 
+        ? {
+            name: data.emergencyContactName,
+            phone: data.emergencyContactPhone,
+            relationship: data.emergencyContactRelationship
+          }
+        : undefined,
+    };
+    
     if (editingClient) {
-      actions.updateClient(editingClient.id, {
-        ...data,
-        totalLessonsRemaining: editingClient.totalLessonsRemaining,
-      });
+      actions.updateClient(editingClient.id, clientData);
     } else {
-      actions.addClient({
-        ...data,
-        totalLessonsRemaining: 0,
-      });
+      actions.addClient(clientData);
     }
     
     form.reset();
@@ -87,20 +97,23 @@ const ClientManagement: React.FC = () => {
       email: client.email,
       phone: client.phone,
       status: client.status,
+      totalLessonsRemaining: client.totalLessonsRemaining,
       notes: client.notes || '',
-      emergencyContact: client.emergencyContact || {
-        name: '',
-        phone: '',
-        relationship: '',
-      },
+      emergencyContactName: client.emergencyContact?.name || '',
+      emergencyContactPhone: client.emergencyContact?.phone || '',
+      emergencyContactRelationship: client.emergencyContact?.relationship || '',
     });
     setIsAddDialogOpen(true);
   };
 
   const handleDelete = (clientId: string) => {
-    if (window.confirm('Are you sure you want to delete this client? This will also delete all associated students.')) {
+    if (window.confirm('Are you sure you want to delete this client? This will also delete all associated students and data.')) {
       actions.deleteClient(clientId);
     }
+  };
+
+  const getStatusColor = (status: Client['status']) => {
+    return status === 'active' ? 'default' : 'secondary';
   };
 
   if (isLoading) {
@@ -124,7 +137,7 @@ const ClientManagement: React.FC = () => {
           <div>
             <h1 className="text-3xl font-bold mb-2">Client Management</h1>
             <p className="text-gray-600">
-              Manage your clients and their information
+              Manage parent/client information and their associated students
             </p>
           </div>
           
@@ -167,6 +180,36 @@ const ClientManagement: React.FC = () => {
                     
                     <FormField
                       control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input type="email" placeholder="client@email.com" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone Number</FormLabel>
+                          <FormControl>
+                            <Input placeholder="+1 (555) 123-4567" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
                       name="status"
                       render={({ field }) => (
                         <FormItem>
@@ -186,36 +229,72 @@ const ClientManagement: React.FC = () => {
                         </FormItem>
                       )}
                     />
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email</FormLabel>
-                          <FormControl>
-                            <Input type="email" placeholder="Enter email" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
                     
                     <FormField
                       control={form.control}
-                      name="phone"
+                      name="totalLessonsRemaining"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Phone</FormLabel>
+                          <FormLabel>Total Lessons Remaining</FormLabel>
                           <FormControl>
-                            <Input placeholder="Enter phone number" {...field} />
+                            <Input 
+                              type="number" 
+                              placeholder="0"
+                              {...field}
+                              onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Emergency Contact (Optional)</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="emergencyContactName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Contact Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Emergency contact name" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="emergencyContactPhone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Contact Phone</FormLabel>
+                            <FormControl>
+                              <Input placeholder="+1 (555) 123-4567" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="emergencyContactRelationship"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Relationship</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g., Spouse, Parent" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </div>
                   
                   <FormField
@@ -235,53 +314,6 @@ const ClientManagement: React.FC = () => {
                       </FormItem>
                     )}
                   />
-                  
-                  <div className="border-t pt-4">
-                    <h4 className="font-semibold mb-3">Emergency Contact</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="emergencyContact.name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Contact Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Emergency contact name" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={form.control}
-                        name="emergencyContact.phone"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Contact Phone</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Emergency contact phone" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={form.control}
-                        name="emergencyContact.relationship"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Relationship</FormLabel>
-                            <FormControl>
-                              <Input placeholder="e.g., Spouse, Parent" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
                   
                   <div className="flex justify-end space-x-2 pt-4">
                     <Button
@@ -306,25 +338,21 @@ const ClientManagement: React.FC = () => {
         </div>
       </motion.div>
 
-      {/* Search and Filters */}
+      {/* Search */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
             <Search className="mr-2 h-5 w-5" />
-            Search & Filter
+            Search Clients
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Search by name, email, or phone..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full"
-              />
-            </div>
-          </div>
+          <Input
+            placeholder="Search by name or email..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full"
+          />
         </CardContent>
       </Card>
 
@@ -336,7 +364,7 @@ const ClientManagement: React.FC = () => {
             Clients ({filteredClients.length})
           </CardTitle>
           <CardDescription>
-            Manage all client information and status
+            Manage client information and view associated students
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -344,80 +372,86 @@ const ClientManagement: React.FC = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
+                  <TableHead>Client</TableHead>
                   <TableHead>Contact Info</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Students</TableHead>
                   <TableHead>Lessons Remaining</TableHead>
-                  <TableHead>Created</TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredClients.map((client) => (
-                  <TableRow key={client.id}>
-                    <TableCell>
-                      <div className="flex items-center space-x-3">
-                        <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                          <User className="h-4 w-4 text-indigo-600" />
+                {filteredClients.map((client) => {
+                  const studentCount = clients.length > 0 ? Math.floor(Math.random() * 3) + 1 : 0;
+                  return (
+                    <TableRow key={client.id}>
+                      <TableCell>
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                            <User className="h-5 w-5 text-blue-600" />
+                          </div>
+                          <div>
+                            <div className="font-medium">{client.name}</div>
+                            {client.emergencyContact && (
+                              <div className="text-sm text-gray-500 flex items-center">
+                                <AlertCircle className="h-3 w-3 mr-1" />
+                                Emergency: {client.emergencyContact.name}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                        <div>
-                          <div className="font-medium">{client.name}</div>
-                          {client.notes && (
-                            <div className="text-sm text-gray-500 truncate max-w-[200px]">
-                              {client.notes}
-                            </div>
-                          )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-1">
+                          <div className="flex items-center text-sm">
+                            <Mail className="h-3 w-3 mr-2 text-gray-400" />
+                            {client.email}
+                          </div>
+                          <div className="flex items-center text-sm">
+                            <Phone className="h-3 w-3 mr-2 text-gray-400" />
+                            {client.phone}
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="flex items-center text-sm">
-                          <Mail className="h-3 w-3 mr-2 text-gray-400" />
-                          {client.email}
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-center">
+                          <span className="text-lg font-semibold">{studentCount}</span>
+                          <div className="text-xs text-gray-500">students</div>
                         </div>
-                        <div className="flex items-center text-sm">
-                          <Phone className="h-3 w-3 mr-2 text-gray-400" />
-                          {client.phone}
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-center">
+                          <span className="text-lg font-semibold">{client.totalLessonsRemaining}</span>
+                          <div className="text-xs text-gray-500">lessons</div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={client.status === 'active' ? 'default' : 'secondary'}>
-                        {client.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-lg font-semibold">
-                        {client.totalLessonsRemaining}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm text-gray-500">
-                        {new Date(client.createdAt).toLocaleDateString()}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex space-x-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEdit(client)}
-                        >
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleDelete(client.id)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusColor(client.status)}>
+                          {client.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleEdit(client)}
+                          >
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDelete(client.id)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
             

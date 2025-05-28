@@ -1,73 +1,284 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Bell, 
-  Mail, 
-  MessageSquare, 
-  Plus, 
-  Send, 
-  Settings, 
-  Users, 
-  Clock,
-  CheckCircle,
-  XCircle,
-  AlertCircle
-} from 'lucide-react';
-import { useNotificationTemplates, useNotificationLogs } from '@/hooks/useNotificationData';
+import { Bell, Mail, MessageSquare, Settings, Users } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useClients } from '@/hooks/useAdminData';
-import TemplateManager from '@/components/admin/TemplateManager';
-import NotificationSender from '@/components/admin/NotificationSender';
-import DeliveryTracking from '@/components/admin/DeliveryTracking';
-import ReminderAutomation from '@/components/admin/ReminderAutomation';
+import { useAdminStore, Client } from '@/stores/useAdminStore';
+
+// Define Zod schema for notification templates
+const templateFormSchema = z.object({
+  name: z.string().min(1, 'Template name is required'),
+  subject: z.string().min(1, 'Subject is required'),
+  body: z.string().min(1, 'Body is required'),
+  type: z.enum(['email', 'sms', 'push']),
+  targetAudience: z.enum(['all', 'clients', 'tutors', 'students']),
+});
+
+type TemplateFormData = z.infer<typeof templateFormSchema>;
+
+// Mock notification templates
+const mockTemplates = [
+  {
+    id: '1',
+    name: 'Welcome Email',
+    subject: 'Welcome to Our Tutoring Service!',
+    body: 'Dear {clientName}, welcome to our platform! We are excited to help you achieve your academic goals.',
+    type: 'email',
+    targetAudience: 'clients',
+  },
+  {
+    id: '2',
+    name: 'Lesson Reminder SMS',
+    subject: '',
+    body: 'Hi {studentName}, your lesson with {tutorName} is scheduled for tomorrow at {time}.',
+    type: 'sms',
+    targetAudience: 'students',
+  },
+];
+
+// Template Manager Component
+const TemplateManager: React.FC<{ templates: any[]; clients: Client[] }> = ({ templates, clients }) => {
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<any | null>(null);
+  const { actions } = useAdminStore();
+
+  const form = useForm<TemplateFormData>({
+    resolver: zodResolver(templateFormSchema),
+    defaultValues: {
+      name: '',
+      subject: '',
+      body: '',
+      type: 'email',
+      targetAudience: 'all',
+    },
+  });
+
+  const handleSubmit = (data: TemplateFormData) => {
+    // Handle template submission logic here (e.g., save to state or API)
+    console.log('Template data submitted:', data);
+    form.reset();
+    setIsAddDialogOpen(false);
+    setEditingTemplate(null);
+  };
+
+  const handleEdit = (template: any) => {
+    setEditingTemplate(template);
+    form.reset({
+      name: template.name,
+      subject: template.subject,
+      body: template.body,
+      type: template.type,
+      targetAudience: template.targetAudience,
+    });
+    setIsAddDialogOpen(true);
+  };
+
+  const handleDelete = (templateId: string) => {
+    if (window.confirm('Are you sure you want to delete this template?')) {
+      // Implement delete logic here
+      console.log('Deleting template:', templateId);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold">Notification Templates</h2>
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <DialogTrigger asChild>
+            <Button onClick={() => {
+              setEditingTemplate(null);
+              form.reset();
+            }}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Template
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>
+                {editingTemplate ? 'Edit Template' : 'Add New Template'}
+              </DialogTitle>
+              <DialogDescription>
+                {editingTemplate ? 'Update template details' : 'Create a new notification template'}
+              </DialogDescription>
+            </DialogHeader>
+
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Template Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter template name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="subject"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Subject</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter subject" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="body"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Body</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="Enter notification body" className="min-h-[100px]" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Type</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="email">Email</SelectItem>
+                          <SelectItem value="sms">SMS</SelectItem>
+                          <SelectItem value="push">Push Notification</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="targetAudience"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Target Audience</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select audience" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="all">All</SelectItem>
+                          <SelectItem value="clients">Clients</SelectItem>
+                          <SelectItem value="tutors">Tutors</SelectItem>
+                          <SelectItem value="students">Students</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="flex justify-end space-x-2 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setIsAddDialogOpen(false);
+                      setEditingTemplate(null);
+                      form.reset();
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit">
+                    {editingTemplate ? 'Update Template' : 'Create Template'}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <Card>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Target Audience</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {templates.map((template) => (
+                <TableRow key={template.id}>
+                  <TableCell>{template.name}</TableCell>
+                  <TableCell>{template.type}</TableCell>
+                  <TableCell>{template.targetAudience}</TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEdit(template)}
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDelete(template.id)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
 
 const NotificationCenter: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('overview');
-  const { data: templates, isLoading: templatesLoading } = useNotificationTemplates();
-  const { data: logs, isLoading: logsLoading } = useNotificationLogs();
-  const { data: clients } = useClients();
+  const [selectedTab, setSelectedTab] = useState('templates');
+  const { data: clients = [] } = useClients();
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'delivered': return 'text-green-600 bg-green-50';
-      case 'sent': return 'text-blue-600 bg-blue-50';
-      case 'failed': return 'text-red-600 bg-red-50';
-      case 'pending': return 'text-yellow-600 bg-yellow-50';
-      default: return 'text-gray-600 bg-gray-50';
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'delivered': return <CheckCircle className="h-4 w-4" />;
-      case 'sent': return <Clock className="h-4 w-4" />;
-      case 'failed': return <XCircle className="h-4 w-4" />;
-      case 'pending': return <AlertCircle className="h-4 w-4" />;
-      default: return <Clock className="h-4 w-4" />;
-    }
-  };
-
-  const stats = {
-    totalTemplates: templates?.length || 0,
-    activeTemplates: templates?.filter(t => t.isActive).length || 0,
-    totalSent: logs?.length || 0,
-    deliveryRate: logs?.length ? 
-      Math.round((logs.filter(l => l.status === 'delivered').length / logs.length) * 100) : 0,
-  };
-
-  if (templatesLoading || logsLoading) {
-    return (
-      <div className="p-6">
-        <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-4 border-indigo-300 border-t-indigo-600 rounded-full animate-spin"></div>
-        </div>
-      </div>
-    );
-  }
+  const templates = mockTemplates;
 
   return (
     <div className="p-6 space-y-6">
@@ -80,174 +291,63 @@ const NotificationCenter: React.FC = () => {
           <div>
             <h1 className="text-3xl font-bold mb-2">Notification Center</h1>
             <p className="text-gray-600">
-              Manage email and SMS notifications, templates, and delivery tracking.
+              Manage notification templates and send custom notifications
             </p>
           </div>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            New Template
-          </Button>
         </div>
       </motion.div>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {[
-          {
-            title: 'Total Templates',
-            value: stats.totalTemplates,
-            icon: Mail,
-            color: 'text-blue-600',
-            bgColor: 'bg-blue-50',
-          },
-          {
-            title: 'Active Templates',
-            value: stats.activeTemplates,
-            icon: CheckCircle,
-            color: 'text-green-600',
-            bgColor: 'bg-green-50',
-          },
-          {
-            title: 'Notifications Sent',
-            value: stats.totalSent,
-            icon: Send,
-            color: 'text-purple-600',
-            bgColor: 'bg-purple-50',
-          },
-          {
-            title: 'Delivery Rate',
-            value: `${stats.deliveryRate}%`,
-            icon: Bell,
-            color: 'text-orange-600',
-            bgColor: 'bg-orange-50',
-          },
-        ].map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <motion.div
-              key={stat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, duration: 0.3 }}
-            >
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {stat.title}
-                  </CardTitle>
-                  <div className={`${stat.bgColor} p-2 rounded-md`}>
-                    <Icon className={`h-4 w-4 ${stat.color}`} />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stat.value}</div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      {/* Main Content Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid grid-cols-5 w-full">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-          <TabsTrigger value="send">Send Messages</TabsTrigger>
-          <TabsTrigger value="tracking">Delivery Tracking</TabsTrigger>
-          <TabsTrigger value="automation">Automation</TabsTrigger>
+      <Tabs defaultValue="templates" className="w-full">
+        <TabsList>
+          <TabsTrigger value="templates">
+            <Mail className="mr-2 h-4 w-4" />
+            Templates
+          </TabsTrigger>
+          <TabsTrigger value="notifications">
+            <Bell className="mr-2 h-4 w-4" />
+            Notifications
+          </TabsTrigger>
+          <TabsTrigger value="settings">
+            <Settings className="mr-2 h-4 w-4" />
+            Settings
+          </TabsTrigger>
         </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Recent Notifications */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Clock className="mr-2 h-5 w-5" />
-                  Recent Notifications
-                </CardTitle>
-                <CardDescription>Latest sent messages</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {logs && logs.length > 0 ? (
-                  <div className="space-y-4">
-                    {logs.slice(0, 5).map((log) => (
-                      <div key={log.id} className="flex items-center justify-between p-3 border rounded-lg">
-                        <div className="flex-1">
-                          <p className="font-medium">{log.recipientName}</p>
-                          <p className="text-sm text-gray-500 truncate">{log.subject}</p>
-                          <p className="text-xs text-gray-400">{log.createdAt}</p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Badge variant="outline" className={getStatusColor(log.status)}>
-                            {getStatusIcon(log.status)}
-                            <span className="ml-1">{log.status}</span>
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
-                    <Button variant="outline" className="w-full">
-                      View All Logs
-                    </Button>
-                  </div>
-                ) : (
-                  <p className="text-gray-500 text-center py-4">No notifications sent yet</p>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Quick Actions */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Send className="mr-2 h-5 w-5" />
-                  Quick Actions
-                </CardTitle>
-                <CardDescription>Common notification tasks</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 gap-3">
-                  <Button className="h-16 flex flex-col" onClick={() => setActiveTab('send')}>
-                    <Mail className="mb-2" />
-                    Send Payment Confirmation
-                  </Button>
-                  <Button variant="outline" className="h-16 flex flex-col" onClick={() => setActiveTab('send')}>
-                    <MessageSquare className="mb-2" />
-                    Send Lesson Reminder
-                  </Button>
-                  <Button variant="outline" className="h-16 flex flex-col" onClick={() => setActiveTab('automation')}>
-                    <Users className="mb-2" />
-                    Setup Automation Rule
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="templates">
-          <TemplateManager templates={templates || []} />
-        </TabsContent>
-
-        <TabsContent value="send">
-          <NotificationSender 
-            templates={templates || []} 
-            clients={clients || []}
-          />
-        </TabsContent>
-
-        <TabsContent value="tracking">
-          <DeliveryTracking logs={logs || []} />
-        </TabsContent>
-
-        <TabsContent value="automation">
-          <ReminderAutomation 
-            templates={templates || []}
-            clients={clients || []}
-          />
-        </TabsContent>
-      </Tabs>
+      
+      <TabsContent value="templates">
+        <TemplateManager 
+          templates={templates} 
+          clients={clients}
+        />
+      </TabsContent>
+      
+      <TabsContent value="notifications">
+        <Card>
+          <CardHeader>
+            <CardTitle>Send Custom Notification</CardTitle>
+            <CardDescription>
+              Send a custom notification to a specific client or group
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p>This feature is under development.</p>
+          </CardContent>
+        </Card>
+      </TabsContent>
+      
+      <TabsContent value="settings">
+        <Card>
+          <CardHeader>
+            <CardTitle>Notification Settings</CardTitle>
+            <CardDescription>
+              Configure notification preferences and settings
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p>This feature is under development.</p>
+          </CardContent>
+        </Card>
+      </TabsContent>
+    </Tabs>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -85,7 +84,14 @@ const StudentManagement: React.FC = () => {
 
   const handleSubmit = (data: StudentFormData) => {
     const studentData = {
-      ...data,
+      clientId: data.clientId,
+      name: data.name,
+      email: data.email,
+      grade: data.grade,
+      subjects: data.subjects,
+      lessonBalance: data.lessonBalance,
+      status: data.status,
+      notes: data.notes,
       assignedWork: editingStudent?.assignedWork || [],
       totalLessonsCompleted: editingStudent?.totalLessonsCompleted || 0,
     };
@@ -103,7 +109,14 @@ const StudentManagement: React.FC = () => {
 
   const handleWorkSubmit = (data: WorkAssignmentData) => {
     if (selectedStudent) {
-      actions.addWorkAssignment(selectedStudent.id, data);
+      const workData = {
+        title: data.title,
+        description: data.description,
+        subject: data.subject,
+        dueDate: data.dueDate,
+        status: data.status,
+      };
+      actions.addWorkAssignment(selectedStudent.id, workData);
       workForm.reset();
       setIsWorkDialogOpen(false);
       setSelectedStudent(null);
@@ -451,13 +464,13 @@ const StudentManagement: React.FC = () => {
                           </TableCell>
                           <TableCell>
                             <div className="text-sm">
-                              <div className="font-medium">{client?.name}</div>
-                              <div className="text-gray-500">{client?.email}</div>
+                              <div className="font-medium">{client?.name || 'Unknown Client'}</div>
+                              <div className="text-gray-500">{client?.email || ''}</div>
                             </div>
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-wrap gap-1">
-                              {student.subjects.map((subject) => (
+                              {(student.subjects || []).map((subject) => (
                                 <Badge key={subject} variant="outline" className="text-xs">
                                   {subject}
                                 </Badge>
@@ -547,9 +560,9 @@ const StudentManagement: React.FC = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      {student.assignedWork.length > 0 ? (
+                      {(student.assignedWork || []).length > 0 ? (
                         <div className="space-y-3">
-                          {student.assignedWork.map((assignment) => (
+                          {(student.assignedWork || []).map((assignment) => (
                             <div key={assignment.id} className="flex items-center justify-between p-3 border rounded-lg">
                               <div className="flex items-center space-x-3">
                                 {getWorkStatusIcon(assignment.status)}
