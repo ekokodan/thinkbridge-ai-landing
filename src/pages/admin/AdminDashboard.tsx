@@ -1,15 +1,16 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, DollarSign, Calendar, BookOpen, TrendingUp, AlertCircle } from 'lucide-react';
+import { Users, DollarSign, Calendar, BookOpen, TrendingUp, AlertCircle, Bell } from 'lucide-react';
 import { useDashboardStats } from '@/hooks/useAdminData';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard: React.FC = () => {
   const { data: stats, isLoading } = useDashboardStats();
+  const navigate = useNavigate();
 
   const statCards = [
     {
@@ -63,10 +64,18 @@ const AdminDashboard: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-        <p className="text-gray-600">
-          Welcome to your ThinkBridge admin dashboard. Here's your overview for today.
-        </p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
+            <p className="text-gray-600">
+              Welcome to your ThinkBridge admin dashboard. Here's your overview for today.
+            </p>
+          </div>
+          <Button onClick={() => navigate('/admin/notifications')}>
+            <Bell className="mr-2 h-4 w-4" />
+            Notification Center
+          </Button>
+        </div>
       </motion.div>
 
       {/* Statistics Cards */}
@@ -205,7 +214,7 @@ const AdminDashboard: React.FC = () => {
             <CardDescription>Common tasks and shortcuts</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Button className="h-20 flex flex-col">
                 <Users className="mb-2" />
                 Add New Client
@@ -217,6 +226,10 @@ const AdminDashboard: React.FC = () => {
               <Button variant="outline" className="h-20 flex flex-col">
                 <DollarSign className="mb-2" />
                 Record Payment
+              </Button>
+              <Button variant="outline" className="h-20 flex flex-col" onClick={() => navigate('/admin/notifications')}>
+                <Bell className="mb-2" />
+                Send Notifications
               </Button>
             </div>
           </CardContent>
@@ -244,7 +257,7 @@ const AdminDashboard: React.FC = () => {
                   <p className="font-medium">Payment Reminders Needed</p>
                   <p className="text-sm text-gray-600">2 clients have low lesson balances</p>
                 </div>
-                <Button size="sm" className="ml-auto">
+                <Button size="sm" className="ml-auto" onClick={() => navigate('/admin/notifications')}>
                   Send Reminders
                 </Button>
               </div>
@@ -254,7 +267,7 @@ const AdminDashboard: React.FC = () => {
                   <p className="font-medium">Class Reminders</p>
                   <p className="text-sm text-gray-600">3 classes scheduled for tomorrow</p>
                 </div>
-                <Button size="sm" variant="outline" className="ml-auto">
+                <Button size="sm" variant="outline" className="ml-auto" onClick={() => navigate('/admin/notifications')}>
                   Send Reminders
                 </Button>
               </div>

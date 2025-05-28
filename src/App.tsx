@@ -25,6 +25,7 @@ const LibraryPage = lazy(() => import("./pages/library/LibraryPage"));
 
 // Admin pages
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const NotificationCenter = lazy(() => import("./pages/admin/NotificationCenter"));
 
 // Course pages
 const CoursePage = lazy(() => import("./pages/courses/CoursePage"));
@@ -51,6 +52,7 @@ const App = () => (
             
             {/* Admin Dashboard Routes */}
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/notifications" element={<NotificationCenter />} />
             
             {/* Tutor Dashboard Routes */}
             <Route path="/tutor" element={<TutorLayout />}>
