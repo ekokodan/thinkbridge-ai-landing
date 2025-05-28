@@ -1,51 +1,30 @@
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, DollarSign, Calendar, BookOpen, TrendingUp, AlertCircle, Bell } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { 
+  Users, 
+  GraduationCap, 
+  DollarSign, 
+  Calendar,
+  TrendingUp,
+  Clock,
+  BookOpen,
+  MessageSquare,
+  Settings,
+  UserCheck,
+  CreditCard,
+  CalendarDays,
+  Library
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useDashboardStats } from '@/hooks/useAdminData';
-import { format } from 'date-fns';
-import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard: React.FC = () => {
   const { data: stats, isLoading } = useDashboardStats();
-  const navigate = useNavigate();
-
-  const statCards = [
-    {
-      title: 'Total Clients',
-      value: stats?.totalClients || 0,
-      icon: Users,
-      description: 'Active clients',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
-    },
-    {
-      title: 'Total Students',
-      value: stats?.totalStudents || 0,
-      icon: BookOpen,
-      description: 'Enrolled students',
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
-    },
-    {
-      title: 'Total Revenue',
-      value: `$${stats?.totalRevenue || 0}`,
-      icon: DollarSign,
-      description: 'This month',
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-50',
-    },
-    {
-      title: 'Upcoming Sessions',
-      value: stats?.upcomingSessions || 0,
-      icon: Calendar,
-      description: 'Next 7 days',
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
-    },
-  ];
 
   if (isLoading) {
     return (
@@ -68,213 +47,287 @@ const AdminDashboard: React.FC = () => {
           <div>
             <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
             <p className="text-gray-600">
-              Welcome to your ThinkBridge admin dashboard. Here's your overview for today.
+              Welcome back! Here's an overview of your tutoring platform.
             </p>
           </div>
-          <Button onClick={() => navigate('/admin/notifications')}>
-            <Bell className="mr-2 h-4 w-4" />
-            Notification Center
-          </Button>
+          
+          <div className="flex space-x-2">
+            <Button variant="outline" asChild>
+              <Link to="/admin/notifications">
+                <MessageSquare className="mr-2 h-4 w-4" />
+                Notifications
+              </Link>
+            </Button>
+            <Button asChild>
+              <Link to="/admin/calendar">
+                <Calendar className="mr-2 h-4 w-4" />
+                Schedule Session
+              </Link>
+            </Button>
+          </div>
         </div>
       </motion.div>
 
-      {/* Statistics Cards */}
+      {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {statCards.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <motion.div
-              key={stat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, duration: 0.3 }}
-            >
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {stat.title}
-                  </CardTitle>
-                  <div className={`${stat.bgColor} p-2 rounded-md`}>
-                    <Icon className={`h-4 w-4 ${stat.color}`} />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{stat.value}</div>
-                  <p className="text-xs text-muted-foreground">
-                    {stat.description}
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Payments */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.3 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <DollarSign className="mr-2 h-5 w-5" />
-                Recent Payments
-              </CardTitle>
-              <CardDescription>Latest payment transactions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {stats?.recentPayments && stats.recentPayments.length > 0 ? (
-                <div className="space-y-4">
-                  {stats.recentPayments.map((payment) => (
-                    <div key={payment.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <p className="font-medium">${payment.amount}</p>
-                        <p className="text-sm text-gray-500">
-                          {payment.lessonsPurchased} lessons - {payment.paymentMethod}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          {format(new Date(payment.paymentDate), 'MMM dd, yyyy')}
-                        </p>
-                      </div>
-                      <Badge variant="outline" className="text-green-600">
-                        Paid
-                      </Badge>
-                    </div>
-                  ))}
-                  <Button variant="outline" className="w-full">
-                    View All Payments
-                  </Button>
-                </div>
-              ) : (
-                <p className="text-gray-500 text-center py-4">No recent payments</p>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Upcoming Sessions */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.3 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Calendar className="mr-2 h-5 w-5" />
-                Upcoming Sessions
-              </CardTitle>
-              <CardDescription>Next scheduled classes</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {stats?.upcomingSessionsData && stats.upcomingSessionsData.length > 0 ? (
-                <div className="space-y-4">
-                  {stats.upcomingSessionsData.map((session) => (
-                    <div key={session.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <p className="font-medium">
-                          {format(new Date(session.scheduledDate), 'MMM dd, yyyy')}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {session.startTime} - {session.endTime}
-                        </p>
-                        <Badge variant="secondary" className="mt-1">
-                          {session.status}
-                        </Badge>
-                      </div>
-                      <Button size="sm" variant="outline">
-                        View
-                      </Button>
-                    </div>
-                  ))}
-                  <Button variant="outline" className="w-full">
-                    View All Sessions
-                  </Button>
-                </div>
-              ) : (
-                <p className="text-gray-500 text-center py-4">No upcoming sessions</p>
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
-
-      {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6, duration: 0.3 }}
-      >
         <Card>
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common tasks and shortcuts</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Clients</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Button className="h-20 flex flex-col" onClick={() => navigate('/admin/clients')}>
-                <Users className="mb-2" />
-                Manage Clients
-              </Button>
-              <Button variant="outline" className="h-20 flex flex-col" onClick={() => navigate('/admin/students')}>
-                <BookOpen className="mb-2" />
-                Manage Students
-              </Button>
-              <Button variant="outline" className="h-20 flex flex-col">
-                <DollarSign className="mb-2" />
-                Record Payment
-              </Button>
-              <Button variant="outline" className="h-20 flex flex-col" onClick={() => navigate('/admin/notifications')}>
-                <Bell className="mb-2" />
-                Send Notifications
-              </Button>
-            </div>
+            <div className="text-2xl font-bold">{stats?.totalClients || 0}</div>
+            <p className="text-xs text-muted-foreground">
+              Active parent accounts
+            </p>
           </CardContent>
         </Card>
-      </motion.div>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Students</CardTitle>
+            <GraduationCap className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.totalStudents || 0}</div>
+            <p className="text-xs text-muted-foreground">
+              Enrolled students
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Revenue</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${stats?.totalRevenue?.toFixed(2) || '0.00'}</div>
+            <p className="text-xs text-muted-foreground">
+              Total payments received
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Sessions</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.upcomingSessions || 0}</div>
+            <p className="text-xs text-muted-foreground">
+              Upcoming this week
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
-      {/* Alerts/Notifications */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.7, duration: 0.3 }}
-      >
+      {/* Management Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+          <Link to="/admin/clients">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Users className="mr-2 h-5 w-5" />
+                Client Management
+              </CardTitle>
+              <CardDescription>
+                Manage parent accounts and contact information
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-bold">{stats?.totalClients || 0}</span>
+                <Badge variant="secondary">Active</Badge>
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+          <Link to="/admin/students">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <GraduationCap className="mr-2 h-5 w-5" />
+                Student Management
+              </CardTitle>
+              <CardDescription>
+                Track students, lessons, and assigned work
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-bold">{stats?.totalStudents || 0}</span>
+                <Badge variant="secondary">Enrolled</Badge>
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+          <Link to="/admin/tutors">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <UserCheck className="mr-2 h-5 w-5" />
+                Tutor Management
+              </CardTitle>
+              <CardDescription>
+                Manage tutors, roles, and permissions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-bold">0</span>
+                <Badge variant="secondary">Staff</Badge>
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+          <Link to="/admin/content">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Library className="mr-2 h-5 w-5" />
+                Content Library
+              </CardTitle>
+              <CardDescription>
+                Manage educational content and materials
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-bold">0</span>
+                <Badge variant="secondary">Items</Badge>
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+          <Link to="/admin/payments">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <CreditCard className="mr-2 h-5 w-5" />
+                Payment Management
+              </CardTitle>
+              <CardDescription>
+                Track payments and generate reports
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-bold">${stats?.totalRevenue?.toFixed(0) || '0'}</span>
+                <Badge variant="secondary">Revenue</Badge>
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+          <Link to="/admin/calendar">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <CalendarDays className="mr-2 h-5 w-5" />
+                Calendar Management
+              </CardTitle>
+              <CardDescription>
+                Schedule and manage tutoring sessions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-bold">{stats?.upcomingSessions || 0}</span>
+                <Badge variant="secondary">Upcoming</Badge>
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+      </div>
+
+      {/* Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <AlertCircle className="mr-2 h-5 w-5 text-orange-500" />
-              Alerts & Reminders
+              <DollarSign className="mr-2 h-5 w-5" />
+              Recent Payments
             </CardTitle>
+            <CardDescription>
+              Latest payment transactions
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                <AlertCircle className="mr-3 h-5 w-5 text-orange-500" />
-                <div>
-                  <p className="font-medium">Payment Reminders Needed</p>
-                  <p className="text-sm text-gray-600">2 clients have low lesson balances</p>
+            <div className="space-y-4">
+              {stats?.recentPayments?.length ? (
+                stats.recentPayments.map((payment) => (
+                  <div key={payment.id} className="flex items-center justify-between">
+                    <div>
+                      <div className="font-medium">Payment #{payment.id}</div>
+                      <div className="text-sm text-gray-500">
+                        {new Date(payment.paymentDate).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-green-600">
+                        ${payment.amount.toFixed(2)}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {payment.lessonsPurchased} lessons
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-4 text-gray-500">
+                  No recent payments
                 </div>
-                <Button size="sm" className="ml-auto" onClick={() => navigate('/admin/notifications')}>
-                  Send Reminders
-                </Button>
-              </div>
-              <div className="flex items-center p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <Calendar className="mr-3 h-5 w-5 text-blue-500" />
-                <div>
-                  <p className="font-medium">Class Reminders</p>
-                  <p className="text-sm text-gray-600">3 classes scheduled for tomorrow</p>
-                </div>
-                <Button size="sm" variant="outline" className="ml-auto" onClick={() => navigate('/admin/notifications')}>
-                  Send Reminders
-                </Button>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>
-      </motion.div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Clock className="mr-2 h-5 w-5" />
+              Upcoming Sessions
+            </CardTitle>
+            <CardDescription>
+              Next scheduled tutoring sessions
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {stats?.upcomingSessionsData?.length ? (
+                stats.upcomingSessionsData.map((session) => (
+                  <div key={session.id} className="flex items-center justify-between">
+                    <div>
+                      <div className="font-medium">Session #{session.id}</div>
+                      <div className="text-sm text-gray-500">
+                        {new Date(session.scheduledDate).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold">
+                        {session.startTime} - {session.endTime}
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        {session.status}
+                      </Badge>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-4 text-gray-500">
+                  No upcoming sessions
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
