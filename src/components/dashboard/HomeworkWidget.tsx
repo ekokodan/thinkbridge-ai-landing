@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -73,7 +72,7 @@ const HomeworkWidget: React.FC<HomeworkWidgetProps> = ({ homework, isLoading }) 
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <h4 className="font-medium text-sm">{item.title}</h4>
-                    <Badge variant={getPriorityColor(item.priority)} size="sm">
+                    <Badge variant={getPriorityColor(item.priority)}>
                       {item.priority}
                     </Badge>
                   </div>

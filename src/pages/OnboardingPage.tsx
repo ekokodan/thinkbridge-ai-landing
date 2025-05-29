@@ -1,81 +1,51 @@
-
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useCallback } from 'react';
+import { Navigate } from 'react-router-dom';
+import { useStudentStore } from '@/stores/useStudentStore';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
-import OnboardingShell from '@/components/onboarding/OnboardingShell';
+import OnboardingShell from '@/components/OnboardingShell';
 import StepPlan from '@/components/onboarding/StepPlan';
 import StepPersonalInfo from '@/components/onboarding/StepPersonalInfo';
 import StepInterests from '@/components/onboarding/StepInterests';
 import StepSkillSnapshot from '@/components/onboarding/StepSkillSnapshot';
 import StepReview from '@/components/onboarding/StepReview';
 
-const steps = [
-  {
-    title: 'Choose Your Learning Plan',
-    description: 'Select the plan that best fits your learning needs and goals.'
-  },
-  {
-    title: 'Tell Us About Yourself',
-    description: 'Help us understand your academic background and preferences.'
-  },
-  {
-    title: 'Your Learning Interests',
-    description: 'What subjects interest you and what are your learning goals?'
-  },
-  {
-    title: 'Quick Skill Assessment',
-    description: 'Rate your current skill level to personalize your experience.'
-  },
-  {
-    title: 'Review & Confirm',
-    description: 'Review your information and create your ThinkBridge account.'
-  }
-];
-
 const OnboardingPage: React.FC = () => {
-  const { data, actions } = useOnboardingStore();
-  const navigate = useNavigate();
+  const { isAuthenticated } = useStudentStore();
+  const { data, nextStep, prevStep, resetData } = useOnboardingStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleNext = () => {
-    const nextStep = data.currentStep + 1;
-    if (nextStep <= 5) {
-      actions.setCurrentStep(nextStep);
-    }
-  };
+  const currentStep = data.step;
 
-  const handleBack = () => {
-    const prevStep = data.currentStep - 1;
-    if (prevStep >= 1) {
-      actions.setCurrentStep(prevStep);
-    }
-  };
+  const handleNext = useCallback(() => {
+    setIsSubmitting(true);
+    setTimeout(() => {
+      nextStep();
+      setIsSubmitting(false);
+    }, 300);
+  }, [nextStep]);
 
-  const renderStep = () => {
-    switch (data.currentStep) {
-      case 1:
-        return <StepPlan onNext={handleNext} />;
-      case 2:
-        return <StepPersonalInfo onNext={handleNext} onBack={handleBack} />;
-      case 3:
-        return <StepInterests onNext={handleNext} onBack={handleBack} />;
-      case 4:
-        return <StepSkillSnapshot onNext={handleNext} onBack={handleBack} />;
-      case 5:
-        return <StepReview onBack={handleBack} />;
-      default:
-        return <StepPlan onNext={handleNext} />;
-    }
-  };
+  const handlePrev = useCallback(() => {
+    setIsSubmitting(true);
+    setTimeout(() => {
+      prevStep();
+      setIsSubmitting(false);
+    }, 300);
+  }, [prevStep]);
 
-  const currentStepInfo = steps[data.currentStep - 1];
+  if (isAuthenticated) {
+    return <Navigate to="/app" replace />;
+  }
 
   return (
-    <OnboardingShell
-      title={currentStepInfo.title}
-      description={currentStepInfo.description}
-    >
-      {renderStep()}
-    </OnboardingShell>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white">
+      <OnboardingShell>
+        {currentStep === 1 && <StepPlan onNext={handleNext} />}
+        {currentStep === 2 && <StepPersonalInfo onNext={handleNext} onPrev={handlePrev} />}
+        {currentStep === 3 && <StepInterests onNext={handleNext} onPrev={handlePrev} />}
+        {currentStep === 4 && <StepSkillSnapshot onNext={handleNext} onPrev={handlePrev} />}
+        {currentStep === 5 && <StepReview onNext={handleNext} onPrev={handlePrev} />}
+      </OnboardingShell>
+    </div>
   );
 };
 

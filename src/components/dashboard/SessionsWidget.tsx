@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -85,7 +84,7 @@ const SessionsWidget: React.FC<SessionsWidgetProps> = ({ sessions, isLoading }) 
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <h4 className="font-medium text-sm">{session.subject}</h4>
-                      <Badge variant={getSessionTypeColor(session.type)} size="sm">
+                      <Badge variant={getSessionTypeColor(session.type)}>
                         <SessionIcon className="h-3 w-3 mr-1" />
                         {session.type}
                       </Badge>

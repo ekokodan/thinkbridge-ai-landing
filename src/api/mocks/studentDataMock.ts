@@ -1,105 +1,127 @@
 
-import { LessonCredit, Homework, UpcomingSession } from '@/stores/useStudentStore';
+export interface LessonCredit {
+  type: 'ai-session' | 'tutor-session' | 'group-session';
+  remaining: number;
+  total: number;
+  expiryDate: string;
+}
 
+export interface Homework {
+  id: string;
+  title: string;
+  subject: string;
+  dueDate: string;
+  completed: boolean;
+  priority: 'low' | 'medium' | 'high';
+}
+
+export interface UpcomingSession {
+  id: string;
+  subject: string;
+  type: 'video' | 'in-person';
+  date: string;
+  time: string;
+  tutorName: string;
+}
+
+export interface ProgressData {
+  skillRadarData: Array<{
+    subject: string;
+    value: number;
+  }>;
+  progressOverTime: Array<{
+    date: string;
+    score: number;
+  }>;
+}
+
+// Mock data functions
 export const mockGetCredits = async (): Promise<LessonCredit[]> => {
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
+  await new Promise(resolve => setTimeout(resolve, 500));
   return [
     {
       type: 'ai-session',
-      remaining: 12,
-      total: 20,
-      expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+      remaining: 8,
+      total: 10,
+      expiryDate: '2024-02-15'
     },
     {
       type: 'tutor-session',
       remaining: 3,
-      total: 8,
-      expiryDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString()
+      total: 5,
+      expiryDate: '2024-02-20'
     }
   ];
 };
 
 export const mockGetHomework = async (): Promise<Homework[]> => {
   await new Promise(resolve => setTimeout(resolve, 300));
-  
   return [
     {
       id: '1',
       title: 'Algebra Practice Set 3',
       subject: 'Mathematics',
-      dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+      dueDate: 'Tomorrow',
       completed: false,
-      description: 'Complete exercises 1-15 on quadratic equations',
-      difficulty: 'medium'
+      priority: 'high'
     },
     {
       id: '2',
-      title: 'Essay: Scientific Revolution',
-      subject: 'History',
-      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      title: 'Essay: Shakespeare Analysis',
+      subject: 'English',
+      dueDate: 'Friday',
       completed: false,
-      description: 'Write a 500-word essay on the impact of the Scientific Revolution',
-      difficulty: 'hard'
+      priority: 'medium'
     },
     {
       id: '3',
       title: 'Chemistry Lab Report',
       subject: 'Chemistry',
-      dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+      dueDate: 'Completed',
       completed: true,
-      description: 'Submit lab report for Experiment 4: Chemical Reactions',
-      difficulty: 'medium'
+      priority: 'low'
     }
   ];
 };
 
 export const mockGetUpcomingSessions = async (): Promise<UpcomingSession[]> => {
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
+  await new Promise(resolve => setTimeout(resolve, 400));
   return [
     {
       id: '1',
-      title: 'Math Tutoring Session',
-      type: 'tutor',
-      datetime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-      duration: 60,
-      tutor: 'Dr. Sarah Johnson'
+      subject: 'Mathematics',
+      type: 'video',
+      date: 'Today',
+      time: '3:00 PM',
+      tutorName: 'Dr. Sarah Wilson'
     },
     {
       id: '2',
-      title: 'AI Study Session - Chemistry',
-      type: 'ai',
-      datetime: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
-      duration: 30
-    },
-    {
-      id: '3',
-      title: 'Group Study - History',
-      type: 'group',
-      datetime: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-      duration: 45
+      subject: 'Physics',
+      type: 'in-person',
+      date: 'Tomorrow',
+      time: '2:00 PM',
+      tutorName: 'Prof. James Chen'
     }
   ];
 };
 
-export const mockGetProgressData = async () => {
-  await new Promise(resolve => setTimeout(resolve, 400));
-  
+export const mockGetProgressData = async (): Promise<ProgressData> => {
+  await new Promise(resolve => setTimeout(resolve, 600));
   return {
     skillRadarData: [
-      { subject: 'Mathematics', value: 75 },
-      { subject: 'Science', value: 68 },
-      { subject: 'English', value: 82 },
-      { subject: 'History', value: 71 },
-      { subject: 'Geography', value: 65 }
+      { subject: 'Mathematics', value: 85 },
+      { subject: 'English', value: 72 },
+      { subject: 'Physics', value: 78 },
+      { subject: 'Chemistry', value: 81 },
+      { subject: 'Biology', value: 69 }
     ],
     progressOverTime: [
-      { date: '2024-01-01', score: 65 },
-      { date: '2024-01-15', score: 68 },
-      { date: '2024-02-01', score: 72 },
-      { date: '2024-02-15', score: 75 },
-      { date: '2024-03-01', score: 78 }
+      { date: 'Jan', score: 65 },
+      { date: 'Feb', score: 70 },
+      { date: 'Mar', score: 75 },
+      { date: 'Apr', score: 78 },
+      { date: 'May', score: 82 }
     ]
   };
 };
