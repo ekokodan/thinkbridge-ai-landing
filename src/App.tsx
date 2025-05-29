@@ -1,6 +1,10 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/sonner';
+import { useStudentStore } from '@/stores/useStudentStore';
+
+// Import existing pages
 import Index from '@/pages/Index';
 import NotFound from '@/pages/NotFound';
 import AboutPage from '@/pages/about/AboutPage';
@@ -25,6 +29,11 @@ import PaymentManagement from '@/pages/admin/PaymentManagement';
 import CalendarManagement from '@/pages/admin/CalendarManagement';
 import NotificationCenter from '@/pages/admin/NotificationCenter';
 
+// Import new student experience components
+import OnboardingPage from '@/pages/OnboardingPage';
+import AppLayout from '@/pages/app/AppLayout';
+import DashboardPage from '@/pages/app/DashboardPage';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -34,11 +43,34 @@ const queryClient = new QueryClient({
   },
 });
 
+// Route Guard Component
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated } = useStudentStore();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/onboarding" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// Public Route Guard (redirect if authenticated)
+const PublicRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated } = useStudentStore();
+  
+  if (isAuthenticated) {
+    return <Navigate to="/app" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
+          {/* Public Marketing Routes */}
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/pricing" element={<PricingPage />} />
@@ -50,6 +82,29 @@ function App() {
           <Route path="/waitlist" element={<WaitlistPage />} />
           <Route path="/join-tutor" element={<JoinTutorPage />} />
           <Route path="/booking/*" element={<BookingLayout><div /></BookingLayout>} />
+          
+          {/* Student Onboarding (Public) */}
+          <Route 
+            path="/onboarding" 
+            element={
+              <PublicRoute>
+                <OnboardingPage />
+              </PublicRoute>
+            } 
+          />
+          
+          {/* Student App (Protected) */}
+          <Route 
+            path="/app" 
+            element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<DashboardPage />} />
+            {/* We'll add more student routes here like library, settings, etc. */}
+          </Route>
           
           {/* Tutor Routes */}
           <Route path="/tutor" element={<TutorLayout />}>
