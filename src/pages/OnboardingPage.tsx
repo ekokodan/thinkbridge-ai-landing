@@ -1,8 +1,9 @@
+
 import React, { useState, useCallback } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useStudentStore } from '@/stores/useStudentStore';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
-import OnboardingShell from '@/components/OnboardingShell';
+import OnboardingShell from '@/components/onboarding/OnboardingShell';
 import StepPlan from '@/components/onboarding/StepPlan';
 import StepPersonalInfo from '@/components/onboarding/StepPersonalInfo';
 import StepInterests from '@/components/onboarding/StepInterests';
@@ -33,19 +34,17 @@ const OnboardingPage: React.FC = () => {
   }, [prevStep]);
 
   if (isAuthenticated) {
-    return <Navigate to="/app" replace />;
+    return <Navigate to="/student" replace />;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white">
-      <OnboardingShell>
-        {currentStep === 1 && <StepPlan onNext={handleNext} />}
-        {currentStep === 2 && <StepPersonalInfo onNext={handleNext} onPrev={handlePrev} />}
-        {currentStep === 3 && <StepInterests onNext={handleNext} onPrev={handlePrev} />}
-        {currentStep === 4 && <StepSkillSnapshot onNext={handleNext} onPrev={handlePrev} />}
-        {currentStep === 5 && <StepReview onNext={handleNext} onPrev={handlePrev} />}
-      </OnboardingShell>
-    </div>
+    <OnboardingShell>
+      {currentStep === 1 && <StepPlan onNext={handleNext} />}
+      {currentStep === 2 && <StepPersonalInfo onNext={handleNext} onBack={handlePrev} />}
+      {currentStep === 3 && <StepInterests onNext={handleNext} onBack={handlePrev} />}
+      {currentStep === 4 && <StepSkillSnapshot onNext={handleNext} onBack={handlePrev} />}
+      {currentStep === 5 && <StepReview onBack={handlePrev} />}
+    </OnboardingShell>
   );
 };
 

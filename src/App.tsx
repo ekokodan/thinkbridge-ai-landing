@@ -31,8 +31,8 @@ import NotificationCenter from '@/pages/admin/NotificationCenter';
 
 // Import new student experience components
 import OnboardingPage from '@/pages/OnboardingPage';
-import AppLayout from '@/pages/app/AppLayout';
-import DashboardPage from '@/pages/app/DashboardPage';
+import StudentLayout from '@/pages/student/StudentLayout';
+import StudentDashboard from '@/pages/student/StudentDashboard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -59,7 +59,7 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useStudentStore();
   
   if (isAuthenticated) {
-    return <Navigate to="/app" replace />;
+    return <Navigate to="/student" replace />;
   }
   
   return <>{children}</>;
@@ -93,16 +93,16 @@ function App() {
             } 
           />
           
-          {/* Student App (Protected) */}
+          {/* Student Portal (Protected) - Changed from /app to /student */}
           <Route 
-            path="/app" 
+            path="/student" 
             element={
               <ProtectedRoute>
-                <AppLayout />
+                <StudentLayout />
               </ProtectedRoute>
             }
           >
-            <Route index element={<DashboardPage />} />
+            <Route index element={<StudentDashboard />} />
             {/* We'll add more student routes here like library, settings, etc. */}
           </Route>
           

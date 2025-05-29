@@ -1,61 +1,62 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { useOnboardingStore } from '@/stores/useOnboardingStore';
-import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 
 interface OnboardingShellProps {
   children: React.ReactNode;
-  title: string;
-  description: string;
 }
 
-const OnboardingShell: React.FC<OnboardingShellProps> = ({ 
-  children, 
-  title, 
-  description 
-}) => {
+const OnboardingShell: React.FC<OnboardingShellProps> = ({ children }) => {
   const { data } = useOnboardingStore();
-  const progressValue = ((data.currentStep - 1) / 4) * 100;
-
+  
+  const steps = [
+    'Choose Plan',
+    'Personal Info', 
+    'Interests',
+    'Skills',
+    'Review'
+  ];
+  
+  const currentStepIndex = data.currentStep - 1;
+  const progress = ((data.currentStep - 1) / (steps.length - 1)) * 100;
+  
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl">
-        {/* Progress Bar */}
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-white">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Progress Header */}
         <div className="mb-8">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-slate-600">
-              Step {data.currentStep} of 5
-            </span>
-            <span className="text-sm text-slate-500">
-              {Math.round(progressValue)}% Complete
-            </span>
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">
+              Welcome to ThinkBridge
+            </h1>
+            <p className="text-slate-600">
+              Step {data.currentStep} of {steps.length}: {steps[currentStepIndex]}
+            </p>
           </div>
-          <Progress value={progressValue} className="h-2" />
+          
+          {/* Progress Bar */}
+          <div className="mb-4">
+            <Progress value={progress} className="h-2" />
+          </div>
+          
+          {/* Step Labels */}
+          <div className="flex justify-between text-xs text-slate-500">
+            {steps.map((step, index) => (
+              <span 
+                key={index}
+                className={`${index < data.currentStep ? 'text-indigo-600 font-medium' : ''}`}
+              >
+                {step}
+              </span>
+            ))}
+          </div>
         </div>
-
-        {/* Main Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-        >
-          <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
-            <CardContent className="p-8">
-              <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold text-slate-900 mb-2">
-                  {title}
-                </h1>
-                <p className="text-slate-600 text-lg">
-                  {description}
-                </p>
-              </div>
-              
-              {children}
-            </CardContent>
-          </Card>
-        </motion.div>
+        
+        {/* Content */}
+        <div className="bg-white rounded-2xl shadow-lg p-8">
+          {children}
+        </div>
       </div>
     </div>
   );

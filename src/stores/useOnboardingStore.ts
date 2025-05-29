@@ -2,9 +2,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+export type PlanType = 'ai-only' | 'tutor-lite' | 'tutor-plus';
+
 export interface OnboardingData {
   step: number;
-  plan?: 'ai-only' | 'tutor-lite' | 'tutor-plus';
+  currentStep: number;
+  plan?: PlanType;
   name?: string;
   email?: string;
   age?: number;
@@ -22,13 +25,20 @@ interface OnboardingState {
   nextStep: () => void;
   prevStep: () => void;
   resetData: () => void;
+  actions: {
+    updateData: (newData: Partial<OnboardingData>) => void;
+    nextStep: () => void;
+    prevStep: () => void;
+    resetData: () => void;
+  };
 }
 
 export const useOnboardingStore = create<OnboardingState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       data: {
-        step: 1
+        step: 1,
+        currentStep: 1
       },
       updateData: (newData) =>
         set((state) => ({
@@ -36,16 +46,30 @@ export const useOnboardingStore = create<OnboardingState>()(
         })),
       nextStep: () =>
         set((state) => ({
-          data: { ...state.data, step: state.data.step + 1 }
+          data: { 
+            ...state.data, 
+            step: state.data.step + 1,
+            currentStep: state.data.step + 1
+          }
         })),
       prevStep: () =>
         set((state) => ({
-          data: { ...state.data, step: Math.max(1, state.data.step - 1) }
+          data: { 
+            ...state.data, 
+            step: Math.max(1, state.data.step - 1),
+            currentStep: Math.max(1, state.data.step - 1)
+          }
         })),
       resetData: () =>
         set(() => ({
-          data: { step: 1 }
-        }))
+          data: { step: 1, currentStep: 1 }
+        })),
+      actions: {
+        updateData: (newData) => get().updateData(newData),
+        nextStep: () => get().nextStep(),
+        prevStep: () => get().prevStep(),
+        resetData: () => get().resetData()
+      }
     }),
     {
       name: 'onboarding-storage'
