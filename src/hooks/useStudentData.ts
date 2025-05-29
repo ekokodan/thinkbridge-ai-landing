@@ -17,14 +17,9 @@ export const useCredits = () => {
 };
 
 export const useHomework = () => {
-  const { actions } = useStudentStore();
-  
   return useQuery({
     queryKey: ['homework'],
     queryFn: mockGetHomework,
-    onSuccess: (data) => {
-      actions.setHomework(data);
-    }
   });
 };
 
@@ -50,7 +45,7 @@ export const useContentLibrary = (filters?: {
   return useQuery({
     queryKey: ['content-library', filters],
     queryFn: () => mockGetContentItems(filters),
-    keepPreviousData: true
+    placeholderData: (previousData) => previousData
   });
 };
 

@@ -2,6 +2,7 @@
 import React from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import { useStudentStore } from '@/stores/useStudentStore';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import AppNavbar from '@/components/layout/AppNavbar';
 import AppSidebar from '@/components/layout/AppSidebar';
 
@@ -13,15 +14,17 @@ const AppLayout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <AppNavbar />
-      <div className="flex">
+    <SidebarProvider>
+      <div className="min-h-screen bg-slate-50 flex w-full">
         <AppSidebar />
-        <main className="flex-1 min-h-screen">
-          <Outlet />
-        </main>
+        <div className="flex-1 flex flex-col">
+          <AppNavbar />
+          <main className="flex-1 min-h-screen">
+            <Outlet />
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 

@@ -1,107 +1,115 @@
 
 import React from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { stepFourSchema } from '@/lib/validationSchemas';
-import { useOnboardingStore } from '@/stores/useOnboardingStore';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Card, CardContent } from '@/components/ui/card';
+import { useOnboardingStore } from '@/stores/useOnboardingStore';
+import { stepFourSchema } from '@/lib/validationSchemas';
+import { z } from 'zod';
 
-const skillLevels = [
-  { value: 1, label: 'Beginner', description: 'Just starting out' },
-  { value: 2, label: 'Basic', description: 'Know the fundamentals' },
-  { value: 3, label: 'Intermediate', description: 'Comfortable with concepts' },
-  { value: 4, label: 'Advanced', description: 'Strong understanding' },
-  { value: 5, label: 'Expert', description: 'Mastery level' }
-];
+type StepFourData = z.infer<typeof stepFourSchema>;
 
-const StepSkillSnapshot: React.FC<{ onNext: () => void; onBack: () => void }> = ({ 
-  onNext, 
-  onBack 
-}) => {
-  const { data, actions } = useOnboardingStore();
+interface StepSkillSnapshotProps {
+  onNext: () => void;
+  onPrev: () => void;
+}
+
+const StepSkillSnapshot: React.FC<StepSkillSnapshotProps> = ({ onNext, onPrev }) => {
+  const { data, updateData } = useOnboardingStore();
   
-  const { handleSubmit, control, formState: { errors } } = useForm({
+  const form = useForm<StepFourData>({
     resolver: zodResolver(stepFourSchema),
     defaultValues: {
-      skillLevels: data.skillLevels
+      skillLevels: data.skillLevels || {}
     }
   });
 
-  const onSubmit = (formData: any) => {
-    actions.updateData(formData);
-    actions.markStepComplete(4);
+  const { watch, setValue, handleSubmit, formState: { errors } } = form;
+  const skillLevels = watch('skillLevels');
+
+  const subjects = data.subjects || [];
+
+  const getSkillLabel = (level: number) => {
+    const labels = ['', 'Beginner', 'Basic', 'Intermediate', 'Advanced', 'Expert'];
+    return labels[level] || 'Unknown';
+  };
+
+  const handleSkillChange = (subject: string, value: number[]) => {
+    const newSkillLevels = { ...skillLevels, [subject]: value[0] };
+    setValue('skillLevels', newSkillLevels);
+  };
+
+  const onSubmit = (formData: StepFourData) => {
+    updateData(formData);
     onNext();
   };
 
-  const getSkillLabel = (value: number) => {
-    const skill = skillLevels.find(s => s.value === value);
-    return skill ? `${skill.label} - ${skill.description}` : '';
-  };
-
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="text-center mb-6">
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold text-slate-900 mb-2">
+          Skill Snapshot
+        </h2>
         <p className="text-slate-600">
-          Rate your current skill level in each subject to help us personalize your learning experience.
+          Rate your current skill level in each subject (1 = Beginner, 5 = Expert)
         </p>
       </div>
 
-      <div className="space-y-4">
-        {data.subjects.map((subject) => (
-          <Card key={subject}>
-            <CardContent className="p-6">
-              <Label className="text-base font-medium mb-4 block">{subject}</Label>
-              
-              <Controller
-                name={`skillLevels.${subject}`}
-                control={control}
-                defaultValue={3}
-                render={({ field }) => (
-                  <div className="space-y-4">
-                    <Slider
-                      value={[field.value]}
-                      onValueChange={(value) => field.onChange(value[0])}
-                      max={5}
-                      min={1}
-                      step={1}
-                      className="w-full"
-                    />
-                    
-                    <div className="flex justify-between text-xs text-slate-500">
-                      {skillLevels.map((level) => (
-                        <span key={level.value} className="text-center">
-                          {level.label}
-                        </span>
-                      ))}
-                    </div>
-                    
-                    <p className="text-sm text-indigo-600 font-medium text-center">
-                      {getSkillLabel(field.value)}
-                    </p>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {subjects.map((subject) => {
+          const currentLevel = skillLevels[subject] || 3;
+          
+          return (
+            <Card key={subject}>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center justify-between">
+                  {subject}
+                  <span className="text-sm font-normal text-indigo-600">
+                    {getSkillLabel(currentLevel)}
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <Slider
+                    value={[currentLevel]}
+                    onValueChange={(value) => handleSkillChange(subject, value)}
+                    max={5}
+                    min={1}
+                    step={1}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-slate-500">
+                    <span>Beginner</span>
+                    <span>Basic</span>
+                    <span>Intermediate</span>
+                    <span>Advanced</span>
+                    <span>Expert</span>
                   </div>
-                )}
-              />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-      
-      {errors.skillLevels && (
-        <p className="text-red-500 text-sm">{errors.skillLevels.message}</p>
-      )}
-      
-      <div className="flex justify-between">
-        <Button type="button" variant="outline" onClick={onBack}>
-          Back
-        </Button>
-        <Button type="submit">
-          Continue
-        </Button>
-      </div>
-    </form>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+
+        {Object.keys(errors).length > 0 && (
+          <div className="text-red-600 text-sm">
+            Please rate your skill level for all subjects.
+          </div>
+        )}
+
+        <div className="flex justify-between pt-6">
+          <Button type="button" variant="outline" onClick={onPrev}>
+            Previous
+          </Button>
+          <Button type="submit">
+            Next: Review
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 };
 
