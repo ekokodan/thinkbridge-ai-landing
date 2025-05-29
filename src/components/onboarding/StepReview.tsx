@@ -30,7 +30,7 @@ const StepReview: React.FC<{ onBack: () => void }> = ({ onBack }) => {
       studentActions.setProfile(profile);
       
       toast.success('Welcome to ThinkBridge! Your profile has been created.');
-      navigate('/app');
+      navigate('/student');
     } catch (error) {
       toast.error('There was an error creating your profile. Please try again.');
     } finally {
@@ -100,7 +100,7 @@ const StepReview: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <div>
                 <span className="text-slate-600 block mb-1">Subjects:</span>
                 <div className="flex flex-wrap gap-1">
-                  {data.subjects.map((subject) => (
+                  {data.subjects?.map((subject) => (
                     <Badge key={subject} variant="outline" className="text-xs">
                       {subject}
                     </Badge>
@@ -148,7 +148,7 @@ const StepReview: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </CardHeader>
           <CardContent>
             <div className="grid gap-2">
-              {Object.entries(data.skillLevels).map(([subject, level]) => (
+              {data.skillLevels && Object.entries(data.skillLevels).map(([subject, level]) => (
                 <div key={subject} className="flex justify-between items-center">
                   <span className="text-slate-600">{subject}:</span>
                   <div className="flex items-center space-x-2">

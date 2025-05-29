@@ -42,7 +42,7 @@ const OnboardingPage: React.FC = () => {
       {currentStep === 1 && <StepPlan onNext={handleNext} />}
       {currentStep === 2 && <StepPersonalInfo onNext={handleNext} onBack={handlePrev} />}
       {currentStep === 3 && <StepInterests onNext={handleNext} onBack={handlePrev} />}
-      {currentStep === 4 && <StepSkillSnapshot onNext={handleNext} onBack={handlePrev} />}
+      {currentStep === 4 && <StepSkillSnapshot onNext={handleNext} onPrev={handlePrev} />}
       {currentStep === 5 && <StepReview onBack={handlePrev} />}
     </OnboardingShell>
   );

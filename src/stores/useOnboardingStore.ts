@@ -25,11 +25,13 @@ interface OnboardingState {
   nextStep: () => void;
   prevStep: () => void;
   resetData: () => void;
+  markStepComplete: (step: number) => void;
   actions: {
     updateData: (newData: Partial<OnboardingData>) => void;
     nextStep: () => void;
     prevStep: () => void;
     resetData: () => void;
+    markStepComplete: (step: number) => void;
   };
 }
 
@@ -64,11 +66,16 @@ export const useOnboardingStore = create<OnboardingState>()(
         set(() => ({
           data: { step: 1, currentStep: 1 }
         })),
+      markStepComplete: (step) => {
+        // This can be used for tracking completed steps if needed
+        console.log(`Step ${step} completed`);
+      },
       actions: {
         updateData: (newData) => get().updateData(newData),
         nextStep: () => get().nextStep(),
         prevStep: () => get().prevStep(),
-        resetData: () => get().resetData()
+        resetData: () => get().resetData(),
+        markStepComplete: (step) => get().markStepComplete(step)
       }
     }),
     {
