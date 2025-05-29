@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/sonner';
@@ -28,11 +27,16 @@ import ContentManagement from '@/pages/admin/ContentManagement';
 import PaymentManagement from '@/pages/admin/PaymentManagement';
 import CalendarManagement from '@/pages/admin/CalendarManagement';
 import NotificationCenter from '@/pages/admin/NotificationCenter';
+import BlogManagement from '@/pages/admin/BlogManagement';
 
 // Import new student experience components
 import OnboardingPage from '@/pages/OnboardingPage';
 import StudentLayout from '@/pages/student/StudentLayout';
 import StudentDashboard from '@/pages/student/StudentDashboard';
+
+// Import blog components
+import BlogListPage from '@/pages/blog/BlogListPage';
+import BlogPostPage from '@/pages/blog/BlogPostPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -83,6 +87,10 @@ function App() {
           <Route path="/join-tutor" element={<JoinTutorPage />} />
           <Route path="/booking/*" element={<BookingLayout><div /></BookingLayout>} />
           
+          {/* Blog Routes */}
+          <Route path="/blog" element={<BlogListPage />} />
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
+          
           {/* Student Onboarding (Public) */}
           <Route 
             path="/onboarding" 
@@ -121,6 +129,7 @@ function App() {
           <Route path="/admin/payments" element={<PaymentManagement />} />
           <Route path="/admin/calendar" element={<CalendarManagement />} />
           <Route path="/admin/notifications" element={<NotificationCenter />} />
+          <Route path="/admin/blog" element={<BlogManagement />} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>
