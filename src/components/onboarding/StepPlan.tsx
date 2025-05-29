@@ -50,7 +50,7 @@ const plans = [
 ];
 
 const StepPlan: React.FC<{ onNext: () => void }> = ({ onNext }) => {
-  const { data, actions } = useOnboardingStore();
+  const { data, updateData, markStepComplete } = useOnboardingStore();
   
   const { handleSubmit, setValue, watch } = useForm({
     resolver: zodResolver(stepOneSchema),
@@ -60,8 +60,8 @@ const StepPlan: React.FC<{ onNext: () => void }> = ({ onNext }) => {
   const selectedPlan = watch('plan');
 
   const onSubmit = (formData: { plan: PlanType }) => {
-    actions.updateData(formData);
-    actions.markStepComplete(1);
+    updateData(formData);
+    markStepComplete(1);
     onNext();
   };
 
@@ -71,6 +71,15 @@ const StepPlan: React.FC<{ onNext: () => void }> = ({ onNext }) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold text-slate-900 mb-2">
+          Choose Your Learning Plan
+        </h2>
+        <p className="text-slate-600">
+          Select the plan that best fits your learning needs and goals.
+        </p>
+      </div>
+
       <div className="grid gap-4 md:grid-cols-3">
         {plans.map((plan, index) => (
           <motion.div

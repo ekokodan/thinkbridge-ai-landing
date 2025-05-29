@@ -25,14 +25,8 @@ interface OnboardingState {
   nextStep: () => void;
   prevStep: () => void;
   resetData: () => void;
+  setStep: (step: number) => void;
   markStepComplete: (step: number) => void;
-  actions: {
-    updateData: (newData: Partial<OnboardingData>) => void;
-    nextStep: () => void;
-    prevStep: () => void;
-    resetData: () => void;
-    markStepComplete: (step: number) => void;
-  };
 }
 
 export const useOnboardingStore = create<OnboardingState>()(
@@ -42,18 +36,21 @@ export const useOnboardingStore = create<OnboardingState>()(
         step: 1,
         currentStep: 1
       },
+      
       updateData: (newData) =>
         set((state) => ({
           data: { ...state.data, ...newData }
         })),
+      
       nextStep: () =>
         set((state) => ({
           data: { 
             ...state.data, 
-            step: state.data.step + 1,
-            currentStep: state.data.step + 1
+            step: Math.min(5, state.data.step + 1),
+            currentStep: Math.min(5, state.data.step + 1)
           }
         })),
+      
       prevStep: () =>
         set((state) => ({
           data: { 
@@ -62,20 +59,23 @@ export const useOnboardingStore = create<OnboardingState>()(
             currentStep: Math.max(1, state.data.step - 1)
           }
         })),
+      
+      setStep: (step) =>
+        set((state) => ({
+          data: { 
+            ...state.data, 
+            step: Math.max(1, Math.min(5, step)),
+            currentStep: Math.max(1, Math.min(5, step))
+          }
+        })),
+      
       resetData: () =>
         set(() => ({
           data: { step: 1, currentStep: 1 }
         })),
+      
       markStepComplete: (step) => {
-        // This can be used for tracking completed steps if needed
         console.log(`Step ${step} completed`);
-      },
-      actions: {
-        updateData: (newData) => get().updateData(newData),
-        nextStep: () => get().nextStep(),
-        prevStep: () => get().prevStep(),
-        resetData: () => get().resetData(),
-        markStepComplete: (step) => get().markStepComplete(step)
       }
     }),
     {

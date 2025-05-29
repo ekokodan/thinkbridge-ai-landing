@@ -12,7 +12,7 @@ import StepReview from '@/components/onboarding/StepReview';
 
 const OnboardingPage: React.FC = () => {
   const { isAuthenticated } = useStudentStore();
-  const { data, nextStep, prevStep, resetData } = useOnboardingStore();
+  const { data, nextStep, prevStep } = useOnboardingStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const currentStep = data.step;
@@ -33,6 +33,7 @@ const OnboardingPage: React.FC = () => {
     }, 300);
   }, [prevStep]);
 
+  // If already authenticated, redirect to student dashboard
   if (isAuthenticated) {
     return <Navigate to="/student" replace />;
   }
@@ -42,7 +43,7 @@ const OnboardingPage: React.FC = () => {
       {currentStep === 1 && <StepPlan onNext={handleNext} />}
       {currentStep === 2 && <StepPersonalInfo onNext={handleNext} onBack={handlePrev} />}
       {currentStep === 3 && <StepInterests onNext={handleNext} onBack={handlePrev} />}
-      {currentStep === 4 && <StepSkillSnapshot onNext={handleNext} onPrev={handlePrev} />}
+      {currentStep === 4 && <StepSkillSnapshot onNext={handleNext} onBack={handlePrev} />}
       {currentStep === 5 && <StepReview onBack={handlePrev} />}
     </OnboardingShell>
   );

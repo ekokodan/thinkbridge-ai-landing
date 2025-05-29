@@ -49,9 +49,9 @@ const StepPersonalInfo: React.FC<{ onNext: () => void; onBack: () => void }> = (
   onNext, 
   onBack 
 }) => {
-  const { data, actions } = useOnboardingStore();
+  const { data, updateData, markStepComplete } = useOnboardingStore();
   
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm({
     resolver: zodResolver(stepTwoSchema),
     defaultValues: {
       age: data.age,
@@ -61,83 +61,94 @@ const StepPersonalInfo: React.FC<{ onNext: () => void; onBack: () => void }> = (
   });
 
   const onSubmit = (formData: any) => {
-    actions.updateData(formData);
-    actions.markStepComplete(2);
+    updateData(formData);
+    markStepComplete(2);
     onNext();
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardContent className="p-4">
-            <Label htmlFor="age">Age</Label>
-            <Input
-              id="age"
-              type="number"
-              min="5"
-              max="100"
-              {...register('age', { valueAsNumber: true })}
-              className="mt-1"
-            />
-            {errors.age && (
-              <p className="text-red-500 text-sm mt-1">{errors.age.message}</p>
-            )}
-          </CardContent>
-        </Card>
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold text-slate-900 mb-2">
+          Tell Us About Yourself
+        </h2>
+        <p className="text-slate-600">
+          Help us personalize your learning experience with some basic information.
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid gap-6 md:grid-cols-2">
+          <Card>
+            <CardContent className="p-4">
+              <Label htmlFor="age">Age</Label>
+              <Input
+                id="age"
+                type="number"
+                min="5"
+                max="100"
+                {...register('age', { valueAsNumber: true })}
+                className="mt-1"
+              />
+              {errors.age && (
+                <p className="text-red-500 text-sm mt-1">{errors.age.message}</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <Label htmlFor="grade">Grade Level</Label>
+              <Select onValueChange={(value) => setValue('grade', value)} defaultValue={data.grade}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Select your grade" />
+                </SelectTrigger>
+                <SelectContent>
+                  {grades.map((grade) => (
+                    <SelectItem key={grade} value={grade}>
+                      {grade}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.grade && (
+                <p className="text-red-500 text-sm mt-1">{errors.grade.message}</p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
 
         <Card>
           <CardContent className="p-4">
-            <Label htmlFor="grade">Grade Level</Label>
-            <Select onValueChange={(value) => setValue('grade', value)} defaultValue={data.grade}>
+            <Label htmlFor="timezone">Timezone</Label>
+            <Select onValueChange={(value) => setValue('timezone', value)} defaultValue={data.timezone}>
               <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Select your grade" />
+                <SelectValue placeholder="Select your timezone" />
               </SelectTrigger>
               <SelectContent>
-                {grades.map((grade) => (
-                  <SelectItem key={grade} value={grade}>
-                    {grade}
+                {timezones.map((tz) => (
+                  <SelectItem key={tz} value={tz}>
+                    {tz}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {errors.grade && (
-              <p className="text-red-500 text-sm mt-1">{errors.grade.message}</p>
+            {errors.timezone && (
+              <p className="text-red-500 text-sm mt-1">{errors.timezone.message}</p>
             )}
           </CardContent>
         </Card>
-      </div>
-
-      <Card>
-        <CardContent className="p-4">
-          <Label htmlFor="timezone">Timezone</Label>
-          <Select onValueChange={(value) => setValue('timezone', value)} defaultValue={data.timezone}>
-            <SelectTrigger className="mt-1">
-              <SelectValue placeholder="Select your timezone" />
-            </SelectTrigger>
-            <SelectContent>
-              {timezones.map((tz) => (
-                <SelectItem key={tz} value={tz}>
-                  {tz}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.timezone && (
-            <p className="text-red-500 text-sm mt-1">{errors.timezone.message}</p>
-          )}
-        </CardContent>
-      </Card>
-      
-      <div className="flex justify-between">
-        <Button type="button" variant="outline" onClick={onBack}>
-          Back
-        </Button>
-        <Button type="submit">
-          Continue
-        </Button>
-      </div>
-    </form>
+        
+        <div className="flex justify-between">
+          <Button type="button" variant="outline" onClick={onBack}>
+            Back
+          </Button>
+          <Button type="submit">
+            Continue
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 };
 

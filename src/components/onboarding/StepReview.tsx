@@ -42,7 +42,7 @@ const StepReview: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     <div className="space-y-6">
       <div className="text-center mb-6">
         <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-slate-900 mb-2">
+        <h2 className="text-3xl font-bold text-slate-900 mb-2">
           Review Your Profile
         </h2>
         <p className="text-slate-600">
@@ -66,19 +66,19 @@ const StepReview: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             <CardContent className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-slate-600">Plan:</span>
-                <Badge variant="default">{planDetails[data.plan!]}</Badge>
+                <Badge variant="default">{data.plan ? planDetails[data.plan] : 'Not selected'}</Badge>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-600">Age:</span>
-                <span className="font-medium">{data.age}</span>
+                <span className="font-medium">{data.age || 'Not provided'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-600">Grade:</span>
-                <span className="font-medium">{data.grade}</span>
+                <span className="font-medium">{data.grade || 'Not provided'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-600">Timezone:</span>
-                <span className="font-medium text-sm">{data.timezone}</span>
+                <span className="font-medium text-sm">{data.timezone || 'Not provided'}</span>
               </div>
             </CardContent>
           </Card>
@@ -100,16 +100,16 @@ const StepReview: React.FC<{ onBack: () => void }> = ({ onBack }) => {
               <div>
                 <span className="text-slate-600 block mb-1">Subjects:</span>
                 <div className="flex flex-wrap gap-1">
-                  {data.subjects?.map((subject) => (
+                  {data.subjects?.length ? data.subjects.map((subject) => (
                     <Badge key={subject} variant="outline" className="text-xs">
                       {subject}
                     </Badge>
-                  ))}
+                  )) : <span className="text-sm text-slate-500">No subjects selected</span>}
                 </div>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-600">Study Hours:</span>
-                <span className="font-medium">{data.weeklyStudyHours}h/week</span>
+                <span className="font-medium">{data.weeklyStudyHours || 0}h/week</span>
               </div>
             </CardContent>
           </Card>
@@ -129,7 +129,7 @@ const StepReview: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-slate-700">{data.learningGoals}</p>
+            <p className="text-slate-700">{data.learningGoals || 'No goals specified'}</p>
           </CardContent>
         </Card>
       </motion.div>
@@ -148,29 +148,32 @@ const StepReview: React.FC<{ onBack: () => void }> = ({ onBack }) => {
           </CardHeader>
           <CardContent>
             <div className="grid gap-2">
-              {data.skillLevels && Object.entries(data.skillLevels).map(([subject, level]) => (
-                <div key={subject} className="flex justify-between items-center">
-                  <span className="text-slate-600">{subject}:</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="flex space-x-1">
-                      {[1, 2, 3, 4, 5].map((i) => (
-                        <div
-                          key={i}
-                          className={`w-3 h-3 rounded-full ${
-                            i <= level ? 'bg-indigo-500' : 'bg-slate-200'
-                          }`}
-                        />
-                      ))}
+              {data.skillLevels && Object.keys(data.skillLevels).length > 0 ? 
+                Object.entries(data.skillLevels).map(([subject, level]) => (
+                  <div key={subject} className="flex justify-between items-center">
+                    <span className="text-slate-600">{subject}:</span>
+                    <div className="flex items-center space-x-2">
+                      <div className="flex space-x-1">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <div
+                            key={i}
+                            className={`w-3 h-3 rounded-full ${
+                              i <= level ? 'bg-indigo-500' : 'bg-slate-200'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-sm font-medium">
+                        {level === 1 ? 'Beginner' :
+                         level === 2 ? 'Basic' :
+                         level === 3 ? 'Intermediate' :
+                         level === 4 ? 'Advanced' : 'Expert'}
+                      </span>
                     </div>
-                    <span className="text-sm font-medium">
-                      {level === 1 ? 'Beginner' :
-                       level === 2 ? 'Basic' :
-                       level === 3 ? 'Intermediate' :
-                       level === 4 ? 'Advanced' : 'Expert'}
-                    </span>
                   </div>
-                </div>
-              ))}
+                )) : 
+                <span className="text-sm text-slate-500">No skill assessments completed</span>
+              }
             </div>
           </CardContent>
         </Card>
