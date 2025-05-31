@@ -57,8 +57,8 @@ const HeroSection = () => {
               <div className="relative bg-white p-8 rounded-2xl shadow-xl">
                 <div className="aspect-video bg-gray-100 rounded-lg mb-6 overflow-hidden">
                   <img 
-                    src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158" 
-                    alt="Student using ThinkBridge platform" 
+                    src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b" 
+                    alt="Modern laptop showing ThinkBridge learning platform" 
                     className="w-full h-full object-cover"
                   />
                 </div>
