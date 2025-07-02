@@ -15,15 +15,15 @@ const BlockRenderer: React.FC<BlockRendererProps> = ({ blocks }) => {
   const renderBlock = (block: CardBlock) => {
     switch (block.type) {
       case 'markdown':
-        return <MarkdownRenderer key={block.id} block={block} />;
+        return <MarkdownRenderer key={block.id} block={block as any} />;
       case 'image':
-        return <ImageRenderer key={block.id} block={block} />;
+        return <ImageRenderer key={block.id} block={block as any} />;
       case 'video':
-        return <VideoRenderer key={block.id} block={block} />;
+        return <VideoRenderer key={block.id} block={block as any} />;
       case 'interactive':
-        return <InteractiveRenderer key={block.id} block={block} />;
+        return <InteractiveRenderer key={block.id} block={block as any} />;
       case 'code':
-        return <CodeRenderer key={block.id} block={block} />;
+        return <CodeRenderer key={block.id} block={block as any} />;
       default:
         return null;
     }
