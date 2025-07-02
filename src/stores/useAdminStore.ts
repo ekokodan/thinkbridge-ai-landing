@@ -1,7 +1,92 @@
-
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
+export interface AdminState {
+  clients: Client[];
+  students: Student[];
+  tutors: Tutor[];
+  classes: Class[];
+  classSessions: ClassSession[];
+  content: ContentItem[];
+  payments: Payment[];
+  addClient: (client: Client) => void;
+  updateClient: (id: string, updates: Partial<Client>) => void;
+  deleteClient: (id: string) => void;
+  addStudent: (student: Student) => void;
+  updateStudent: (id: string, updates: Partial<Student>) => void;
+  deleteStudent: (id: string) => void;
+  addTutor: (tutor: Tutor) => void;
+  updateTutor: (id: string, updates: Partial<Tutor>) => void;
+  deleteTutor: (id: string) => void;
+  addClass: (newClass: Class) => void;
+  updateClass: (id: string, updates: Partial<Class>) => void;
+  deleteClass: (id: string) => void;
+  addClassSession: (session: ClassSession) => void;
+  updateClassSession: (id: string, updates: Partial<ClassSession>) => void;
+  deleteClassSession: (id: string) => void;
+  addContent: (item: ContentItem) => void;
+  updateContent: (id: string, updates: Partial<ContentItem>) => void;
+  deleteContent: (id: string) => void;
+  addPayment: (payment: Payment) => void;
+  updatePayment: (id: string, updates: Partial<Payment>) => void;
+  deletePayment: (id: string) => void;
+}
+
+export interface Tutor {
+  id: string;
+  name: string;
+  email: string;
+  subjects: string[];
+  students: string[];
+  hourlyRate: number;
+  availability: string[];
+  createdAt: string;
+  updatedAt: string;
+  status?: 'active' | 'inactive';
+  yearsOfExperience?: number;
+  qualifications?: string[];
+}
+
+export interface Class {
+  id: string;
+  name: string;
+  description: string;
+  schedule: string;
+  capacity: number;
+  enrolled: number;
+}
+
+export interface ClassSession {
+  id: string;
+  classId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  status: 'scheduled' | 'completed' | 'cancelled';
+  attendees: string[];
+}
+
+export interface ContentItem {
+  id: string;
+  title: string;
+  type: 'video' | 'document' | 'quiz' | 'assignment';
+  subject: string;
+  grade: string;
+  url: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorkAssignment {
+  id: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  status: 'pending' | 'submitted' | 'graded';
+  grade?: number;
+}
+
+// Update existing interfaces to include missing properties
 export interface Client {
   id: string;
   name: string;
@@ -10,191 +95,92 @@ export interface Client {
   students: string[];
   createdAt: string;
   updatedAt: string;
+  status?: 'active' | 'inactive';
+  totalLessonsRemaining?: number;
+  notes?: string;
+  emergencyContact?: {
+    name: string;
+    phone: string;
+    relationship: string;
+  };
 }
 
 export interface Student {
   id: string;
   name: string;
-  email?: string;
-  age: number;
+  email: string;
   grade: string;
   subjects: string[];
-  lessonsRemaining: number;
-  parentId: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Tutor {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  subjects: string[];
-  hourlyRate: number;
-  availability: string[];
-  rating: number;
-  createdAt: string;
-  updatedAt: string;
+  lessonBalance: number;
+  clientId?: string;
+  assignedWork?: WorkAssignment[];
+  totalLessonsCompleted?: number;
+  status?: 'active' | 'inactive';
 }
 
 export interface Payment {
   id: string;
-  studentId: string;
   amount: number;
-  currency: string;
-  method: 'paypal' | 'bank-transfer' | 'wise' | 'cash';
+  method: string;
   status: 'pending' | 'completed' | 'failed';
   date: string;
+  studentId: string;
+  currency: string;
+  clientId?: string;
+  paymentDate?: string;
+  paymentMethod?: 'paypal' | 'bank-transfer' | 'wise' | 'cash';
+  lessonsPurchased?: number;
+  notes?: string;
 }
 
-interface AdminState {
-  clients: Client[];
-  students: Student[];
-  tutors: Tutor[];
-  payments: Payment[];
-  
-  actions: {
-    addClient: (client: Omit<Client, 'id' | 'createdAt' | 'updatedAt'>) => void;
-    updateClient: (id: string, updates: Partial<Client>) => void;
-    deleteClient: (id: string) => void;
-    addStudent: (student: Omit<Student, 'id' | 'createdAt' | 'updatedAt'>) => void;
-    updateStudent: (id: string, updates: Partial<Student>) => void;
-    deleteStudent: (id: string) => void;
-    addTutor: (tutor: Omit<Tutor, 'id' | 'createdAt' | 'updatedAt'>) => void;
-    updateTutor: (id: string, updates: Partial<Tutor>) => void;
-    deleteTutor: (id: string) => void;
-    addPayment: (payment: Omit<Payment, 'id'>) => void;
-    updatePayment: (id: string, updates: Partial<Payment>) => void;
-    deletePayment: (id: string) => void;
-    clearAll: () => void;
-  };
-}
-
-export const useAdminStore = create<AdminState>()(
-  persist(
-    (set, get) => ({
-      clients: [],
-      students: [],
-      tutors: [],
-      payments: [],
-      
-      actions: {
-        addClient: (client) =>
-          set((state) => ({
-            clients: [
-              ...state.clients,
-              {
-                ...client,
-                id: `client_${Date.now()}`,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-              },
-            ],
-          })),
-        
-        updateClient: (id, updates) =>
-          set((state) => ({
-            clients: state.clients.map((client) =>
-              client.id === id
-                ? { ...client, ...updates, updatedAt: new Date().toISOString() }
-                : client
-            ),
-          })),
-        
-        deleteClient: (id) =>
-          set((state) => ({
-            clients: state.clients.filter((client) => client.id !== id),
-          })),
-        
-        addStudent: (student) =>
-          set((state) => ({
-            students: [
-              ...state.students,
-              {
-                ...student,
-                id: `student_${Date.now()}`,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-              },
-            ],
-          })),
-        
-        updateStudent: (id, updates) =>
-          set((state) => ({
-            students: state.students.map((student) =>
-              student.id === id
-                ? { ...student, ...updates, updatedAt: new Date().toISOString() }
-                : student
-            ),
-          })),
-        
-        deleteStudent: (id) =>
-          set((state) => ({
-            students: state.students.filter((student) => student.id !== id),
-          })),
-        
-        addTutor: (tutor) =>
-          set((state) => ({
-            tutors: [
-              ...state.tutors,
-              {
-                ...tutor,
-                id: `tutor_${Date.now()}`,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-              },
-            ],
-          })),
-        
-        updateTutor: (id, updates) =>
-          set((state) => ({
-            tutors: state.tutors.map((tutor) =>
-              tutor.id === id
-                ? { ...tutor, ...updates, updatedAt: new Date().toISOString() }
-                : tutor
-            ),
-          })),
-        
-        deleteTutor: (id) =>
-          set((state) => ({
-            tutors: state.tutors.filter((tutor) => tutor.id !== id),
-          })),
-        
-        addPayment: (payment) =>
-          set((state) => ({
-            payments: [
-              ...state.payments,
-              {
-                ...payment,
-                id: `payment_${Date.now()}`,
-              },
-            ],
-          })),
-        
-        updatePayment: (id, updates) =>
-          set((state) => ({
-            payments: state.payments.map((payment) =>
-              payment.id === id ? { ...payment, ...updates } : payment
-            ),
-          })),
-        
-        deletePayment: (id) =>
-          set((state) => ({
-            payments: state.payments.filter((payment) => payment.id !== id),
-          })),
-        
-        clearAll: () =>
-          set({
-            clients: [],
-            students: [],
-            tutors: [],
-            payments: [],
-          }),
-      },
-    }),
-    {
-      name: 'admin-storage',
-    }
-  )
-);
+export const useAdminStore = create<AdminState>((set) => ({
+  clients: [],
+  students: [],
+  tutors: [],
+  classes: [],
+  classSessions: [],
+  content: [],
+  payments: [],
+  addClient: (client) => set((state) => ({ clients: [...state.clients, client] })),
+  updateClient: (id, updates) =>
+    set((state) => ({
+      clients: state.clients.map((client) => (client.id === id ? { ...client, ...updates } : client)),
+    })),
+  deleteClient: (id) => set((state) => ({ clients: state.clients.filter((client) => client.id !== id) })),
+  addStudent: (student) => set((state) => ({ students: [...state.students, student] })),
+  updateStudent: (id, updates) =>
+    set((state) => ({
+      students: state.students.map((student) => (student.id === id ? { ...student, ...updates } : student)),
+    })),
+  deleteStudent: (id) => set((state) => ({ students: state.students.filter((student) => student.id !== id) })),
+  addTutor: (tutor) => set((state) => ({ tutors: [...state.tutors, tutor] })),
+  updateTutor: (id, updates) =>
+    set((state) => ({
+      tutors: state.tutors.map((tutor) => (tutor.id === id ? { ...tutor, ...updates } : tutor)),
+    })),
+  deleteTutor: (id) => set((state) => ({ tutors: state.tutors.filter((tutor) => tutor.id !== id) })),
+  addClass: (newClass) => set((state) => ({ classes: [...state.classes, newClass] })),
+  updateClass: (id, updates) =>
+    set((state) => ({
+      classes: state.classes.map((existingClass) => (existingClass.id === id ? { ...existingClass, ...updates } : existingClass)),
+    })),
+  deleteClass: (id) => set((state) => ({ classes: state.classes.filter((existingClass) => existingClass.id !== id) })),
+  addClassSession: (session) => set((state) => ({ classSessions: [...state.classSessions, session] })),
+  updateClassSession: (id, updates) =>
+    set((state) => ({
+      classSessions: state.classSessions.map((session) => (session.id === id ? { ...session, ...updates } : session)),
+    })),
+  deleteClassSession: (id) => set((state) => ({ classSessions: state.classSessions.filter((session) => session.id !== id) })),
+  addContent: (item) => set((state) => ({ content: [...state.content, item] })),
+  updateContent: (id, updates) =>
+    set((state) => ({
+      content: state.content.map((item) => (item.id === id ? { ...item, ...updates } : item)),
+    })),
+  deleteContent: (id) => set((state) => ({ content: state.content.filter((item) => item.id !== id) })),
+  addPayment: (payment) => set((state) => ({ payments: [...state.payments, payment] })),
+  updatePayment: (id, updates) =>
+    set((state) => ({
+      payments: state.payments.map((payment) => (payment.id === id ? { ...payment, ...updates } : payment)),
+    })),
+  deletePayment: (id) => set((state) => ({ payments: state.payments.filter((payment) => payment.id !== id) })),
+}));
