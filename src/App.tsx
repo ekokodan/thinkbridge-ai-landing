@@ -21,14 +21,15 @@ import TutorLayout from '@/pages/tutor/TutorLayout';
 import TutorDashboard from '@/pages/tutor/TutorDashboard';
 import StudentsPage from '@/pages/tutor/StudentsPage';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
-import ClientManagement from '@/pages/admin/ClientManagement';
-import StudentManagement from '@/pages/admin/StudentManagement';
-import TutorManagement from '@/pages/admin/TutorManagement';
-import ContentManagement from '@/pages/admin/ContentManagement';
-import PaymentManagement from '@/pages/admin/PaymentManagement';
-import CalendarManagement from '@/pages/admin/CalendarManagement';
-import NotificationCenter from '@/pages/admin/NotificationCenter';
-import BlogManagement from '@/pages/admin/BlogManagement';
+// Temporarily disabled admin imports due to build issues
+// import ClientManagement from '@/pages/admin/ClientManagement';
+// import StudentManagement from '@/pages/admin/StudentManagement';
+// import TutorManagement from '@/pages/admin/TutorManagement';
+// import ContentManagement from '@/pages/admin/ContentManagement';
+// import PaymentManagement from '@/pages/admin/PaymentManagement';
+// import CalendarManagement from '@/pages/admin/CalendarManagement';
+// import NotificationCenter from '@/pages/admin/NotificationCenter';
+// import BlogManagement from '@/pages/admin/BlogManagement';
 
 // Import new student experience components
 import OnboardingPage from '@/pages/OnboardingPage';
@@ -127,16 +128,16 @@ function App() {
             <Route path="students" element={<StudentsPage />} />
           </Route>
           
-          {/* Admin Routes */}
+          {/* Admin Routes - Temporarily disabled due to build issues */}
           <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/clients" element={<ClientManagement />} />
+          {/* <Route path="/admin/clients" element={<ClientManagement />} />
           <Route path="/admin/students" element={<StudentManagement />} />
           <Route path="/admin/tutors" element={<TutorManagement />} />
           <Route path="/admin/content" element={<ContentManagement />} />
           <Route path="/admin/payments" element={<PaymentManagement />} />
           <Route path="/admin/calendar" element={<CalendarManagement />} />
           <Route path="/admin/notifications" element={<NotificationCenter />} />
-          <Route path="/admin/blog" element={<BlogManagement />} />
+          <Route path="/admin/blog" element={<BlogManagement />} /> */}
           
           <Route path="*" element={<NotFound />} />
         </Routes>

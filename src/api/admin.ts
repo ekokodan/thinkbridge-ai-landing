@@ -8,6 +8,7 @@ export const generateMockClients = (): Client[] => [
     name: 'Sarah Johnson',
     email: 'sarah.johnson@email.com',
     phone: '+1 (555) 123-4567',
+    students: ['1', '2'],
     status: 'active',
     totalLessonsRemaining: 24,
     notes: 'Very engaged parent, punctual with payments',
@@ -24,6 +25,7 @@ export const generateMockClients = (): Client[] => [
     name: 'Michael Chen',
     email: 'michael.chen@email.com',
     phone: '+1 (555) 987-6543',
+    students: ['3'],
     status: 'active',
     totalLessonsRemaining: 16,
     notes: 'Prefers evening sessions for children',
@@ -40,6 +42,7 @@ export const generateMockClients = (): Client[] => [
     name: 'Emily Rodriguez',
     email: 'emily.rodriguez@email.com', 
     phone: '+1 (555) 456-7890',
+    students: ['4'],
     status: 'active',
     totalLessonsRemaining: 8,
     notes: 'Single mother, needs flexible scheduling',
@@ -71,7 +74,7 @@ export const generateMockStudents = (): Student[] => [
         description: 'Complete exercises 1-15 on page 45',
         subject: 'Algebra',
         dueDate: '2024-06-01',
-        status: 'assigned',
+        status: 'pending',
         assignedDate: '2024-05-28T10:00:00Z'
       }
     ],
@@ -110,7 +113,7 @@ export const generateMockStudents = (): Student[] => [
         description: 'Work through chapter 8 problems',
         subject: 'AP Calculus',
         dueDate: '2024-05-30',
-        status: 'in-progress',
+        status: 'pending',
         assignedDate: '2024-05-25T14:00:00Z'
       }
     ],
